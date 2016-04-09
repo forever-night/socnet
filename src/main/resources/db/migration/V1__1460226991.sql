@@ -6,7 +6,8 @@ create table account (
   salt varchar(128),
   private_key varchar(64),
   public_key varchar(64),
-  created_at timestamptz
+  created_at timestamptz,
+  version int
 );
 
 
@@ -18,20 +19,21 @@ create table profile (
   phone varchar(16),
   birth_date date,
   info text,
+  version int,
   foreign key (id) references account(id)
 );
 
 
 create table profile_follower (
-  owner int references profile(id),
-  follower int references profile(id)
+  owner_id int references profile(id),
+  follower_id int references profile(id)
 );
 
 
 create table private_message (
   id serial primary key,
-  sender int references profile(id),
-  receiver int references profile(id),
+  sender_id int references profile(id),
+  receiver_id int references profile(id),
   text_content text,
   created_at timestamptz
 );
@@ -39,18 +41,20 @@ create table private_message (
 
 create table public_message (
   id serial primary key,
-  sender int references profile(id),
+  sender_id int references profile(id),
   text_content text,
-  profile_location int references profile(id),
-  created_at timestamptz
+  receiver_id int references profile(id),
+  created_at timestamptz,
+  version int
 );
 
 
 create table community (
   id serial primary key,
   title varchar(128),
-  owner int references profile(id),
-  created_at timestamptz
+  owner_id int references profile(id),
+  created_at timestamptz,
+  version int
 );
 
 
@@ -61,24 +65,15 @@ create table community_admin (
 
 
 create table community_follower (
-  owner int references community(id),
-  follower int references profile(id)
+  owner_id int references community(id),
+  follower_id int references profile(id)
 );
 
 
 create table community_message (
   id serial primary key,
-  sender int references community(id),
+  sender_id int references community(id),
   text_content text,
-  created_at timestamptz
-);
-
-
-create table reply_message (
-  id serial primary key,
-  sender int references profile(id),
-  text_content text,
-  reply_to_profile int references public_message(id),
-  reply_to_community int references community_message(id),
-  created_at timestamptz
+  created_at timestamptz,
+  version int
 );
