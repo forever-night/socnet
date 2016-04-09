@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
 
-    <persistence-unit name="entity_manager_pu">
+    <persistence-unit name="socnet.unit">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/socnetDS</jta-data-source>
+        <class>entities.Account</class>
+        <class>entities.Profile</class>
+        <class>entities.Community</class>
+        <class>entities.PrivateMessage</class>
+        <class>entities.PublicMessage</class>
+        <class>entities.CommunityMessage</class>
         <properties>
-            <property name="hibernate.connection.url" value="${db.url}"/>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/socnet"/>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect"/>
-            <property name="hibernate.connection.username" value="${hibernate.user}"/>
-            <property name="hibernate.connection.password" value="${hibernate.password}"/>
+            <property name="hibernate.connection.username" value="user"/>
+            <property name="hibernate.connection.password" value="user"/>
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
