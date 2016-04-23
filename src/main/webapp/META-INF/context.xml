@@ -1,5 +1,7 @@
-<Context>
-    <Resource id="java:jboss/datasources/socnetDS" type="javax.sql.DataSource" auth="Container"
-            driver="org.postgresql.Driver" url="jdbc:postgresql://localhost:5432/socnet"
-            username="${hibernate.user}" password="${hibernate.password}" maxActive="100" maxIdle="10"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="">
+    <ResourceLink name="jdbc/socnetDB"
+                  global="jdbc/socnetDB"
+                  auth="Container"
+                  type="javax.sql.DataSource" />
 </Context>
