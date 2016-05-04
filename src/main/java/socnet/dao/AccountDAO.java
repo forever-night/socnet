@@ -1,6 +1,6 @@
-package dao;
+package socnet.dao;
 
-import entities.Account;
+import socnet.entities.Account;
 import util.HibernateUtil;
 
 import javax.persistence.EntityManager;

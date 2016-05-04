@@ -1,4 +1,4 @@
-package entities;
+package socnet.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;

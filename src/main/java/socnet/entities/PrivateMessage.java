@@ -1,4 +1,4 @@
-package entities;
+package socnet.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,8 +9,8 @@ import java.util.Objects;
  * Created by anna on 14/03/16.
  */
 @Entity
-@Table(name = "public_message")
-public class PublicMessage implements Serializable, Message {
+@Table(name = "private_message")
+public class PrivateMessage implements Serializable, Message {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
     private Integer id;
@@ -27,9 +27,6 @@ public class PublicMessage implements Serializable, Message {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-
-    @Version
-    private Integer version;
 
     @PrePersist
     protected void prePersist() {
@@ -56,8 +53,8 @@ public class PublicMessage implements Serializable, Message {
         return receiver;
     }
 
-    public void setReceiver(Profile location) {
-        this.receiver = location;
+    public void setReceiver(Profile receiver) {
+        this.receiver = receiver;
     }
 
     public String getTextContent() {
@@ -76,20 +73,12 @@ public class PublicMessage implements Serializable, Message {
         this.createdAt = createdAt;
     }
 
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
     @Override
     public String toString() {
-        return "PublicMessage{" +
+        return "PrivateMessage{" +
                 "id=" + id +
                 ", sender=" + sender +
-                ", location=" + receiver +
+                ", receiver=" + receiver +
                 '}';
     }
 
@@ -97,7 +86,7 @@ public class PublicMessage implements Serializable, Message {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PublicMessage that = (PublicMessage) o;
+        PrivateMessage that = (PrivateMessage) o;
         return Objects.equals(sender, that.sender) &&
                 Objects.equals(receiver, that.receiver) &&
                 Objects.equals(textContent, that.textContent) &&
