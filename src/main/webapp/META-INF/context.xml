@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="">
-    <ResourceLink name="jdbc/socnetDB"
-                  global="jdbc/socnetDB"
-                  auth="Container"
-                  type="javax.sql.DataSource" />
+<Context>
+    <ResourceLink name="jdbc/socnetDS"
+          global="jdbc/socnetDS"
+          auth="Container"
+          type="javax.sql.DataSource" />
 </Context>
