@@ -1,5 +1,8 @@
 package socnet.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -12,8 +15,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "profile")
+@JsonIgnoreProperties({"account", "version"})
 public class Profile implements Serializable {
-    @Id
+    @Id @Column(name = "account_id")
     private Integer id;
 
     @MapsId @OneToOne
@@ -22,15 +26,17 @@ public class Profile implements Serializable {
 
     private String name;
     private String country;
-    private String currentCity;
     private String phone;
     private String info;
+
+    @Column(name = "current_city")
+    private String currentCity;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "birth_date")
     private Date dateOfBirth;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "profile_follower",
                 joinColumns = {@JoinColumn(name = "owner_id")},
                 inverseJoinColumns = {@JoinColumn(name = "follower_id")})

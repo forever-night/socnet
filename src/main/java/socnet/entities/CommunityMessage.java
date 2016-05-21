@@ -1,5 +1,8 @@
 package socnet.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import socnet.entities.interfaces.Message;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -10,7 +13,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "community_message")
-public class CommunityMessage implements Serializable, Message{
+public class CommunityMessage implements Serializable, Message {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
     private Integer id;
@@ -19,11 +22,14 @@ public class CommunityMessage implements Serializable, Message{
     @JoinColumn(name = "sender_id")
     private Community sender;
 
+    @Column(name="text_content")
     private String textContent;
 
+    @Column(name="created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @JsonIgnore
     @Version
     private Integer version;
 

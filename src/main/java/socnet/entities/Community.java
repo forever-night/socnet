@@ -1,5 +1,7 @@
 package socnet.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -38,9 +40,11 @@ public class Community implements Serializable {
     @OneToMany(mappedBy = "sender")
     private List<CommunityMessage> messages;
 
+    @Column(name="created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
+    @JsonIgnore
     @Version
     private Integer version;
 

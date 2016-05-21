@@ -1,5 +1,7 @@
 package socnet.entities;
 
+import socnet.entities.interfaces.Message;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -23,8 +25,10 @@ public class PrivateMessage implements Serializable, Message {
     @JoinColumn(name = "receiver_id")
     private Profile receiver;
 
+    @Column(name = "text_content")
     private String textContent;
 
+    @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
