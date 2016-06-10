@@ -28,6 +28,6 @@
                 <a href="${pageContext.request.contextPath}/sign_up" class="btn btn-default btn-block">Sign up</a>
             </form>
         </div>
-        <script src="<c:url value='/static/js/sign_in.js'/>"></script>
+        <script src="<c:url value='/static/js/signIn.js'/>"></script>
     </jsp:body>
 </t:template>

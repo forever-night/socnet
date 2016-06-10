@@ -1,14 +1,15 @@
-/**
- * Created by anna on 23/04/16.
- */
-var app = angular.module('app', []);
+app = angular.module('app', []);
 
-app.controller('MainCtrl', function () {
-    var self = this;
 
-    self.auth = false;
+app.controller('MainCtrl', function ($scope) {
+    $scope.id = 0;
+    $scope.authorized= false;
 
-    this.setAuth = function(value) {
-        self.auth = value;
-    }
+    $scope.setId = function(id) {
+        $scope.id = id;
+    };
+
+    $scope.setAuthorized = function(value) {
+        $scope.authorized = value;
+    };
 });

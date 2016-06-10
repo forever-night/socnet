@@ -1,6 +1,5 @@
 package socnet.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -10,19 +9,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Created by anna on 14/03/16.
- */
+
 @Entity
 @Table(name = "profile")
-@JsonIgnoreProperties({"account", "version"})
+@JsonIgnoreProperties({"version"})
 public class Profile implements Serializable {
     @Id @Column(name = "account_id")
     private Integer id;
-
-    @MapsId @OneToOne
-    @PrimaryKeyJoinColumn
-    private Account account;
 
     private String name;
     private String country;
@@ -63,14 +56,6 @@ public class Profile implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
     }
 
     public String getName() {

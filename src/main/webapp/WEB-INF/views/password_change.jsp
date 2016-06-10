@@ -25,6 +25,6 @@
                 <button class="btn btn-success" type="submit">Save</button>
             </form>
         </div>
-        <script src="<c:url value='/static/js/password_change.js'/>"></script>
+        <script src="<c:url value='/static/js/passwordChange.js'/>"></script>
     </jsp:body>
 </t:template>

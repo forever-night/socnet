@@ -11,7 +11,7 @@
         <t:main_panel>
             <jsp:attribute name="panel_title">Account</jsp:attribute>
             <jsp:attribute name="panel_body">
-                <div ng-controller="AccountCtrl as account">
+                <div ng-controller="AccountCtrl">
                     <dl class="dl-horizontal">
                         <dt>login: </dt>
                         <dd>asf</dd>
