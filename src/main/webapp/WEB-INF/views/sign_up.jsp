@@ -4,7 +4,7 @@
 
 <t:template>
     <jsp:attribute name="head">
-        <script src="<c:url value='/static/js/signUp.js'/>"></script>
+        <script src="<c:url value='/static/js/signUpController.js'/>"></script>
         <title>sign up</title>
     </jsp:attribute>
     <jsp:body>
