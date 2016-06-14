@@ -1,6 +1,7 @@
 package socnet.dao.impl;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Profile;
 
@@ -8,9 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
-/**
- * Created by anna on 16/05/16.
- */
+
 @Component
 public class ProfileDaoImpl implements ProfileDao{
     @PersistenceContext
@@ -32,6 +31,7 @@ public class ProfileDaoImpl implements ProfileDao{
         return profile.getId();
     }
 
+    @Transactional
     public Profile update(Profile profile) {
         Profile old = em.find(Profile.class, profile.getId());
 

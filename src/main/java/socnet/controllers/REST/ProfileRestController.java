@@ -1,13 +1,16 @@
 package socnet.controllers.REST;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import socnet.beans.interfaces.ProfileBean;
 import socnet.entities.Profile;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -31,14 +34,19 @@ public class ProfileRestController {
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Profile> update(@RequestBody Profile profile, @PathVariable int id) {
-        if (id == profile.getId()) {
+    public ResponseEntity<Integer> update(@RequestBody Profile profile, @PathVariable int id) {
+        if (profile == null || id != profile.getId())
+            return new ResponseEntity<Integer>(HttpStatus.NOT_ACCEPTABLE);
+        else {
             profile = profileBean.update(profile);
 
-            // TODO put profile
+            URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/profile/{id}").buildAndExpand(id).toUri();
 
-            return new ResponseEntity<Profile>(profile, HttpStatus.OK);
-        } else
-            return new ResponseEntity<Profile>(profile, HttpStatus.NOT_ACCEPTABLE);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(uri);
+
+            return new ResponseEntity<Integer>(profile.getId(), headers, HttpStatus.OK);
+        }
     }
 }
