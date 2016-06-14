@@ -1,8 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <t:template>
     <jsp:attribute name="head">
+        <script>
+            var profileId =<c:out value='${profileId}'/>;
+        </script>
+        <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
+        <script src="<c:url value='/static/js/settingsController.js'/>"></script>
         <title>settings</title>
     </jsp:attribute>
     <jsp:body>
@@ -10,35 +16,43 @@
         <t:main_panel>
             <jsp:attribute name="panel_title">Settings</jsp:attribute>
             <jsp:attribute name="panel_body">
-                <div ng-controller="SettingsCtrl as settings" style="margin-top:-15px;">
+                <div ng-controller="SettingsCtrl" style="margin-top:-15px;">
                     <ul class="nav nav-tabs">
-                        <li role="presentation" class="active"><a href="#">Profile</a></li>
+                        <li role="presentation" class="active"
+                            ng-click="setProfileSelected(true)"><a href="#">Profile</a></li>
+                        <li role="presentation" ng-click="setAccountSelected(true)"><a href="#">Account</a></li>
                     </ul>
                     <div ng-show="profileSelected" style="margin-top:30px;">
-                        <form class="ng-pristine ng-valid col-md-8 col-md-offset-2">
+                        <form name="profileForm" class="ng-pristine ng-valid col-md-8 col-md-offset-2">
                             <div class="form-group input-group-sm">
-                                <input type="text" id="inputName" class="form-control" placeholder="Name" required="" autofocus="">
+                                <label>Name</label>
+                                <input type="text" class="form-control" ng-model="profile.name"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <input type="text" id="inputSurname" class="form-control" placeholder="Surname">
+                                <label>Birthday</label>
+                                <input type="date" class="form-control" ng-model="profile.dateOfBirth"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <input type="number" id="inputAge" class="form-control" placeholder="Age">
+                                <label>Country</label>
+                                <input type="text" class="form-control" ng-model="profile.country"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <input type="text" id="inputCountry" class="form-control" placeholder="Country">
+                                <label>City</label>
+                                <input type="text" class="form-control" ng-model="profile.currentCity"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <input type="text" id="inputCity" class="form-control" placeholder="City">
+                                <label>Phone</label>
+                                <input type="tel" class="form-control" ng-model="profile.phone"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <input type="tel" id="inputPhone" class="form-control" placeholder="Phone">
+                                <label>Info</label>
+                                <textarea class="form-control" rows="4" ng-model="profile.info"></textarea>
                             </div>
-                            <div class="form-group input-group-sm">
-                                <input type="text" id="inputInfo" class="form-control" placeholder="Info">
+                            <button class="btn btn-sm btn-default pull-left" ng-click="resetForm()">Cancel</button>
+                            <div class="pull-right">
+                                <button class="btn btn-sm btn-success" ng-click="saveForm()">Save</button>
+                                <p id="status" style="visibility:hidden;"></p>
                             </div>
-                            <br>
-                            <button class="btn btn-success col-md-4 pull-right" type="submit">Save</button>
                         </form>
                     </div>
                 </div>
