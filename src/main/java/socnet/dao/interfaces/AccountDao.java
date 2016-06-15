@@ -6,8 +6,6 @@ import java.util.List;
 
 
 public interface AccountDao {
-    Account authenticate(Account account);
-
     Account find(int id);
 
     List<Account> findAll();
@@ -17,4 +15,6 @@ public interface AccountDao {
     Account update(Account account);
 
     void remove(Account account);
+
+    Account authenticate(Account account);
 }

@@ -14,5 +14,15 @@ public interface AccountBean {
 
     Account update(Account account);
 
+    Account updatePassword(Account account);
+
+    Account updateEmail(Account account);
+
+    void remove(Account account);
+
+    String createSalt();
+
+    String createPasswordHash(String password, String salt);
+
     Account fromJson(String json) throws IOException;
 }

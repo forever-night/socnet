@@ -3,6 +3,7 @@ package socnet.dao.impl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import socnet.dao.interfaces.AccountDao;
 import socnet.entities.Account;
 
@@ -20,18 +21,17 @@ public class AccountDaoImpl implements AccountDao{
     @PersistenceContext
     private EntityManager em;
 
+    @Override
     public Account find(int id) {
         return em.find(Account.class, id);
     }
 
-    public Account findByLogin(String login) {
-        return em.find(Account.class, login);
-    }
-
+    @Override
     public List<Account> findAll() {
         return em.createQuery("from Account", Account.class).getResultList();
     }
 
+    @Override
     public Integer persist(Account account) {
         em.persist(account);
         em.flush();
@@ -39,6 +39,8 @@ public class AccountDaoImpl implements AccountDao{
         return account.getId();
     }
 
+    @Override
+    @Transactional
     public Account update(Account account) {
         Account old = em.find(Account.class, account.getId());
 
@@ -50,12 +52,14 @@ public class AccountDaoImpl implements AccountDao{
         return em.merge(old);
     }
 
+    @Override
     public void remove(Account account) {
         Account old = em.find(Account.class, account.getId());
 
         em.remove(old);
     }
 
+    @Override
     public Account authenticate(Account account) {
         Account acc = null;
 
@@ -67,6 +71,7 @@ public class AccountDaoImpl implements AccountDao{
             acc = (Account) query.getSingleResult();
         } catch (NoResultException e) {
             LOGGER.info("user " + account.getEmail() + " not found");
+            acc = null;
         } finally {
             return acc;
         }

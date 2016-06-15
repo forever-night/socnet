@@ -24,10 +24,17 @@ public class AccountBeanImpl implements AccountBean {
     @Autowired
     private ProfileBean profileBean;
 
+    @Override
     @Transactional
     public int signUp(Account account) {
-        int id = accountDao.persist(account);
+        String salt = createSalt();
+        String password = createPasswordHash(account.getPassword(), salt);
 
+        account.setSalt(salt);
+        account.setPassword(password);
+
+
+        int id = accountDao.persist(account);
         profileBean.create(id);
 
         return id;
@@ -38,14 +45,58 @@ public class AccountBeanImpl implements AccountBean {
         return accountDao.find(id);
     }
 
+    @Override
     public Account authenticate(Account account) {
+        String hash = createPasswordHash(account.getPassword(), account.getSalt());
+        account.setPassword(hash);
+
         return accountDao.authenticate(account);
     }
 
+    @Override
     public Account update(Account account) {
         return accountDao.update(account);
     }
 
+    @Override
+    public Account updatePassword(Account account) {
+        Account old = accountDao.find(account.getId());
+
+        String salt = createSalt();
+        String password = createPasswordHash(account.getPassword(), salt);
+
+        old.setSalt(salt);
+        old.setPassword(password);
+
+        return accountDao.update(old);
+    }
+
+    @Override
+    public Account updateEmail(Account account) {
+        Account old = accountDao.find(account.getId());
+        old.setEmail(account.getEmail());
+
+        return accountDao.update(old);
+    }
+
+    @Override
+    @Transactional
+    public void remove(Account account) {
+        profileBean.remove(account.getId());
+        accountDao.remove(account);
+    }
+
+    @Override
+    public String createSalt() {
+        return "";
+    }
+
+    @Override
+    public String createPasswordHash(String password, String salt) {
+        return password;
+    }
+
+    @Override
     public Account fromJson(String json) {
         ObjectMapper mapper = new ObjectMapper();
 
