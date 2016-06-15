@@ -4,9 +4,7 @@ import socnet.entities.Profile;
 
 import java.util.List;
 
-/**
- * Created by anna on 18/05/16.
- */
+
 public interface ProfileDao {
     Profile find(int id);
 
@@ -15,4 +13,8 @@ public interface ProfileDao {
     Integer persist(Profile profile);
 
     Profile update(Profile profile);
+
+    void remove(Integer id);
+
+    void remove(Profile profile);
 }

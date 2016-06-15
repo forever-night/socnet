@@ -14,14 +14,17 @@ public class ProfileBeanImpl implements ProfileBean {
     @Autowired
     private ProfileDao profileDao;
 
+    @Override
     public Profile find(int id) {
         return profileDao.find(id);
     }
 
+    @Override
     public List<Profile> findAll() {
         return profileDao.findAll();
     }
 
+    @Override
     public Profile create(int accountId) {
         Profile profile = new Profile();
         profile.setId(accountId);
@@ -31,7 +34,18 @@ public class ProfileBeanImpl implements ProfileBean {
         return profile;
     }
 
+    @Override
     public Profile update(Profile profile) {
         return profileDao.update(profile);
+    }
+
+    @Override
+    public void remove(Integer id) {
+        profileDao.remove(id);
+    }
+
+    @Override
+    public void remove(Profile profile) {
+        profileDao.remove(profile);
     }
 }

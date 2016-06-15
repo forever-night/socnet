@@ -15,15 +15,18 @@ public class ProfileDaoImpl implements ProfileDao{
     @PersistenceContext
     private EntityManager em;
 
+    @Override
     public Profile find(int id) {
         return em.find(Profile.class, id);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Profile> findAll() {
         return em.createQuery("from Profile").getResultList();
     }
 
+    @Override
     public Integer persist(Profile profile) {
         em.persist(profile);
         em.flush();
@@ -31,6 +34,7 @@ public class ProfileDaoImpl implements ProfileDao{
         return profile.getId();
     }
 
+    @Override
     @Transactional
     public Profile update(Profile profile) {
         Profile old = em.find(Profile.class, profile.getId());
@@ -43,5 +47,20 @@ public class ProfileDaoImpl implements ProfileDao{
         old.setInfo(profile.getInfo());
 
         return em.merge(old);
+    }
+
+    @Override
+    public void remove(Integer id) {
+        Profile old = em.find(Profile.class, id);
+
+        em.remove(old);
+    }
+
+    @Override
+    @Transactional
+    public void remove(Profile profile) {
+        Profile old = em.find(Profile.class, profile.getId());
+
+        em.remove(old);
     }
 }
