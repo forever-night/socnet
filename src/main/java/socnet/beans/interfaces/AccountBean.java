@@ -1,5 +1,6 @@
 package socnet.beans.interfaces;
 
+import socnet.dto.PasswordChangeDto;
 import socnet.entities.Account;
 
 import java.io.IOException;
@@ -19,6 +20,8 @@ public interface AccountBean {
     Account updateEmail(Account account);
 
     void remove(Account account);
+
+    int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto);
 
     String createSalt();
 

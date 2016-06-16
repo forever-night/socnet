@@ -27,6 +27,22 @@ public class AccountDaoImpl implements AccountDao{
     }
 
     @Override
+    public Account findByEmail(String email) {
+        Account acc = null;
+
+        Query query = em.createQuery("from Account where email = :email");
+        query.setParameter("email", email);
+
+        try {
+            acc = (Account) query.getSingleResult();
+        } catch (NoResultException e) {
+            LOGGER.info("user " + email + " not found");
+        } finally {
+            return acc;
+        }
+    }
+
+    @Override
     public List<Account> findAll() {
         return em.createQuery("from Account", Account.class).getResultList();
     }
@@ -71,7 +87,6 @@ public class AccountDaoImpl implements AccountDao{
             acc = (Account) query.getSingleResult();
         } catch (NoResultException e) {
             LOGGER.info("user " + account.getEmail() + " not found");
-            acc = null;
         } finally {
             return acc;
         }

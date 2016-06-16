@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import socnet.beans.interfaces.AccountBean;
 import socnet.beans.interfaces.ProfileBean;
 import socnet.dao.interfaces.AccountDao;
+import socnet.dto.PasswordChangeDto;
 import socnet.entities.Account;
 
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class AccountBeanImpl implements AccountBean {
     @Override
     @Transactional
     public int signUp(Account account) {
+//        TODO check if email already used
+
         String salt = createSalt();
         String password = createPasswordHash(account.getPassword(), salt);
 
@@ -72,11 +75,22 @@ public class AccountBeanImpl implements AccountBean {
     }
 
     @Override
+    @Transactional
     public Account updateEmail(Account account) {
+        Account accountWithEmail = accountDao.findByEmail(account.getEmail());
         Account old = accountDao.find(account.getId());
-        old.setEmail(account.getEmail());
 
-        return accountDao.update(old);
+        if (old.getEmail().equals(account.getEmail()))
+            return null;
+
+        if (accountWithEmail == null) {
+            old.setEmail(account.getEmail());
+
+            return accountDao.update(old);
+        }
+
+        // account with this email already exists
+        return null;
     }
 
     @Override
@@ -84,6 +98,24 @@ public class AccountBeanImpl implements AccountBean {
     public void remove(Account account) {
         profileBean.remove(account.getId());
         accountDao.remove(account);
+    }
+
+    /**
+     * @return 0 if update successful, <br> 1 if old password is wrong, <br> 2 if the parameter is null
+     * */
+    @Override
+    public int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto) {
+        if (passwordChangeDto == null)
+            return 2;
+
+        Account temp = authenticate(passwordChangeDto.getAccount());
+
+        if (temp == null)
+            return 1;
+
+        temp.setPassword(passwordChangeDto.getNewPassword());
+        updatePassword(temp);
+        return 0;
     }
 
     @Override

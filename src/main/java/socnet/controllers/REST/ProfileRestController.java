@@ -36,7 +36,7 @@ public class ProfileRestController {
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Integer> update(@RequestBody Profile profile, @PathVariable int id) {
         if (profile == null || id != profile.getId())
-            return new ResponseEntity<Integer>(HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
         else {
             profile = profileBean.update(profile);
 

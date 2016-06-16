@@ -8,6 +8,8 @@ import java.util.List;
 public interface AccountDao {
     Account find(int id);
 
+    Account findByEmail(String email);
+
     List<Account> findAll();
 
     Integer persist(Account account);
