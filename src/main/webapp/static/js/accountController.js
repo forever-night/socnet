@@ -1,3 +1,0 @@
-account.controller('AccountCtrl', function () {
-    
-});

@@ -8,6 +8,7 @@
             var profileId =<c:out value='${profileId}'/>;
         </script>
         <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
+        <script src="<c:url value='/static/js/classes/account.js'/>"></script>
         <script src="<c:url value='/static/js/settingsController.js'/>"></script>
         <title>settings</title>
     </jsp:attribute>
@@ -18,42 +19,95 @@
             <jsp:attribute name="panel_body">
                 <div ng-controller="SettingsCtrl" style="margin-top:-15px;">
                     <ul class="nav nav-tabs">
-                        <li role="presentation" class="active"
+                        <li id="tabProfile" role="presentation"
                             ng-click="setProfileSelected(true)"><a href="#">Profile</a></li>
-                        <li role="presentation" ng-click="setAccountSelected(true)"><a href="#">Account</a></li>
+                        <li id="tabAccount" role="presentation"
+                            ng-click="setAccountSelected(true)"><a href="#">Account</a></li>
                     </ul>
                     <div ng-show="profileSelected" style="margin-top:30px;">
                         <form name="profileForm" class="ng-pristine ng-valid col-md-8 col-md-offset-2">
                             <div class="form-group input-group-sm">
-                                <label>Name</label>
-                                <input type="text" class="form-control" ng-model="profile.name"/>
+                                <label for="inputName">Name</label>
+                                <input id="inputName" type="text" class="form-control" ng-model="profile.name"
+                                       required/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <label>Birthday</label>
-                                <input type="date" class="form-control" ng-model="profile.dateOfBirth"/>
+                                <label for="inputBirthday">Birthday</label>
+                                <input id="inputBirthday" type="date" class="form-control"
+                                       ng-model="profile.dateOfBirth"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <label>Country</label>
-                                <input type="text" class="form-control" ng-model="profile.country"/>
+                                <label for="inputCountry">Country</label>
+                                <input id="inputCountry" type="text" class="form-control" ng-model="profile.country"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <label>City</label>
-                                <input type="text" class="form-control" ng-model="profile.currentCity"/>
+                                <label for="inputCity">City</label>
+                                <input id="inputCity" type="text" class="form-control" ng-model="profile.currentCity"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <label>Phone</label>
-                                <input type="tel" class="form-control" ng-model="profile.phone"/>
+                                <label for="inputPhone">Phone</label>
+                                <input id="inputPhone" type="tel" class="form-control" ng-model="profile.phone"/>
                             </div>
                             <div class="form-group input-group-sm">
-                                <label>Info</label>
-                                <textarea class="form-control" rows="4" ng-model="profile.info"></textarea>
+                                <label for="inputInfo">Info</label>
+                                <textarea id="inputInfo" class="form-control" rows="4"
+                                          ng-model="profile.info"></textarea>
                             </div>
                             <button class="btn btn-sm btn-default pull-left" ng-click="resetForm()">Cancel</button>
                             <div class="pull-right">
                                 <button class="btn btn-sm btn-success" ng-click="saveForm()">Save</button>
-                                <p id="status" style="visibility:hidden;"></p>
+                                <span id="statusProfile" class="label" style="visibility:hidden;"></span>
                             </div>
                         </form>
+                    </div>
+                    <div ng-show="accountSelected" style="margin-top:30px;">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <h3>Change e-mail</h3>
+                                <form class="ng-valid">
+                                    <label>E-mail</label>
+                                    <p>{{account.email}}</p>
+                                    <div class="form-group input-group-sm">
+                                        <label for="inputEmail">New e-mail</label>
+                                        <input id="inputEmail" type="email" class="form-control"
+                                               ng-model="newAccount.email" required/>
+                                    </div>
+                                    <button class="btn btn-sm btn-success" ng-click="changeEmail()">Change e-mail
+                                    </button>
+                                    <span id="statusEmail" class="label" style="visibility: hidden;"></span>
+                                </form>
+                            </li>
+                            <li class="list-group-item">
+                                <h3>Change password</h3>
+                                <form class="ng-valid">
+                                    <div class="form-group input-group-sm">
+                                        <label for="inputOldPassword">Old password</label>
+                                        <input id="inputOldPassword" type="password" class="form-control"
+                                               ng-model="passwordChange.oldPassword" required/>
+                                    </div>
+                                    <div class="form-group input-group-sm">
+                                        <label for="inputNewPassword">New password</label>
+                                        <input id="inputNewPassword" type="password" class="form-control"
+                                               ng-model="passwordChange.newPassword" required/>
+                                    </div>
+                                    <div class="form-group input-group-sm">
+                                        <label for="inputConfirmPassword">Confirm new password</label>
+                                        <input id="inputConfirmPassword" type="password" class="form-control"
+                                               ng-model="passwordChange.confirmPassword" required/>
+                                    </div>
+                                    <button class="btn btn-sm btn-success" ng-click="changePassword()">Change password
+                                    </button>
+                                    <span id="statusPassword" class="label" style="visibility: hidden;"></span>
+                                </form>
+                            </li>
+                            <li class="list-group-item">
+                                <h3>Delete account</h3>
+                                <div>
+                                    <button class="btn btn-sm btn-danger" ng-click="deleteAccount()">Delete account
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </jsp:attribute>
