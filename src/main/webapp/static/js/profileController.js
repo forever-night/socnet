@@ -8,7 +8,7 @@ app.controller('ProfileCtrl', function($scope, $http) {
             function(response) {
                 var data = response.data;
 
-                if (data != null || data !== undefined) {
+                if (data != null) {
                     $scope.profile = new Profile(
                         data.id,
                         data.name,
@@ -21,9 +21,6 @@ app.controller('ProfileCtrl', function($scope, $http) {
                     
                     profileId = $scope.profile.id;
                 }
-            },
-            function(response) {
-                console.log('error ' + response.status);
             }
         );
         

@@ -56,8 +56,9 @@
                             <button class="btn btn-sm btn-default pull-left" ng-click="resetForm()">Cancel</button>
                             <div class="pull-right">
                                 <button class="btn btn-sm btn-success" ng-click="saveForm()">Save</button>
-                                <span id="statusProfile" class="label" style="visibility:hidden;"></span>
                             </div>
+                            <div id="statusProfile" class="alert" role="alert"
+                                 style="visibility:hidden; margin-top:60px;"></div>
                         </form>
                     </div>
                     <div ng-show="accountSelected" style="margin-top:30px;">
@@ -74,7 +75,8 @@
                                     </div>
                                     <button class="btn btn-sm btn-success" ng-click="changeEmail()">Change e-mail
                                     </button>
-                                    <span id="statusEmail" class="label" style="visibility: hidden;"></span>
+                                    <div id="statusEmail" class="alert" role="alert"
+                                          style="visibility: hidden; margin-top:10px;"></div>
                                 </form>
                             </li>
                             <li class="list-group-item">
@@ -97,7 +99,8 @@
                                     </div>
                                     <button class="btn btn-sm btn-success" ng-click="changePassword()">Change password
                                     </button>
-                                    <span id="statusPassword" class="label" style="visibility: hidden;"></span>
+                                    <div id="statusPassword" class="alert" role="alert"
+                                          style="visibility: hidden; margin-top:10px;"></div>
                                 </form>
                             </li>
                             <li class="list-group-item">

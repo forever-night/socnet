@@ -4,6 +4,7 @@
 
 <t:template>
     <jsp:attribute name="head">
+        <script src="<c:url value='/static/js/classes/account.js'/>"></script>
         <script src="<c:url value='/static/js/signUpController.js'/>"></script>
         <title>sign up</title>
     </jsp:attribute>
@@ -29,11 +30,12 @@
                 </div>
                 <div class="form-group">
                     <label class="sr-only">Confirm Password</label>
-                    <input type="password" class="form-control"
+                    <input type="password" ng-model="confirmPassword" class="form-control"
                            placeholder="Confirm Password" required/>
+                </div><br>
+                <div id="status" class="alert" role="alert" style="visibility: hidden;">
                 </div>
-                <br>
-                <button class="btn btn-lg btn-success btn-block" ng-click="postAccount(account)">Sign up</button>
+                <button class="btn btn-lg btn-success btn-block" ng-click="signUp()">Sign up</button>
                 <a href="${pageContext.request.contextPath}/sign_in" class="btn btn-default btn-block">I already have an
                     account</a>
             </form>
