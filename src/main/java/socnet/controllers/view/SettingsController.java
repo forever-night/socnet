@@ -20,9 +20,12 @@ public class SettingsController {
     public String settings(@PathVariable int id, Model model) {
         Profile profile = profileBean.find(id);
 
-        if (profile != null)
+        if (profile != null) {
             model.addAttribute("profileId", id);
-
-        return "settings";
+            return "settings";
+        } else {
+            model.addAttribute("errorMessage", "User not found");
+            return "error";
+        }
     }
 }
