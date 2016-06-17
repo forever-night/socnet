@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class SigninController {
     @RequestMapping(value = {"/sign_in"}, method = RequestMethod.GET)
     public String signIn() {
-        return "sign_in";
+        return "signIn";
     }
 }
