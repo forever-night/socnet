@@ -50,17 +50,23 @@ public class AccountRestController {
             return new ResponseEntity<Integer>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @RequestMapping(path = "/{id}/check", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> authenticate(@RequestBody Account account) {
+    @RequestMapping(path = "/signin", method = RequestMethod.POST)
+    public ResponseEntity<Integer> singIn(@RequestBody Account account) {
         if (account != null) {
             Account persistent = accountBean.authenticate(account);
 
-            if (persistent != null)
-                return new ResponseEntity<Boolean>(true, HttpStatus.OK);
-            else
-                return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+            if (persistent != null) {
+                URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/profile/{id}").buildAndExpand(persistent.getId()).toUri();
+    
+                HttpHeaders headers = new HttpHeaders();
+                headers.setLocation(uri);
+                
+                return new ResponseEntity<Integer>(persistent.getId(), headers, HttpStatus.OK);
+            } else
+                return new ResponseEntity<Integer>(0, HttpStatus.OK);
         } else
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(path = "/{id}/email", method = RequestMethod.PUT)

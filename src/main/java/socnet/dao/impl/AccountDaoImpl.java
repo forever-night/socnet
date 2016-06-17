@@ -76,13 +76,30 @@ public class AccountDaoImpl implements AccountDao{
     }
 
     @Override
-    public Account authenticate(Account account) {
+    public Account authenticateByEmail(Account account) {
         Account acc = null;
 
         Query query = em.createQuery("from Account acc where acc.email = :email and acc.password = :password");
         query.setParameter("email", account.getEmail());
         query.setParameter("password", account.getPassword());
 
+        try {
+            acc = (Account) query.getSingleResult();
+        } catch (NoResultException e) {
+            LOGGER.info("user " + account.getEmail() + " not found");
+        } finally {
+            return acc;
+        }
+    }
+    
+    @Override
+    public Account authenticateByLogin(Account account) {
+        Account acc = null;
+        
+        Query query = em.createQuery("from Account acc where acc.login = :login and acc.password = :password");
+        query.setParameter("login", account.getLogin());
+        query.setParameter("password", account.getPassword());
+        
         try {
             acc = (Account) query.getSingleResult();
         } catch (NoResultException e) {

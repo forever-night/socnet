@@ -28,6 +28,9 @@ public class AccountBeanImpl implements AccountBean {
     @Override
     @Transactional
     public int signUp(Account account) {
+        if (account.getId() != null)
+            account.setId(null);
+        
 //        TODO check if email already used
 
         String salt = createSalt();
@@ -53,7 +56,12 @@ public class AccountBeanImpl implements AccountBean {
         String hash = createPasswordHash(account.getPassword(), account.getSalt());
         account.setPassword(hash);
 
-        return accountDao.authenticate(account);
+        if (account.getEmail() != null)
+            return accountDao.authenticateByEmail(account);
+        else if (account.getLogin() != null)
+            return accountDao.authenticateByLogin(account);
+        else
+            return null;
     }
 
     @Override

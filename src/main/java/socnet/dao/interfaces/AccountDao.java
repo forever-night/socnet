@@ -18,5 +18,7 @@ public interface AccountDao {
 
     void remove(Account account);
 
-    Account authenticate(Account account);
+    Account authenticateByEmail(Account account);
+    
+    Account authenticateByLogin(Account account);
 }
