@@ -27,6 +27,22 @@ public class AccountDaoImpl implements AccountDao{
     }
 
     @Override
+    public Account findByLogin(String login) {
+        Account acc = null;
+
+        Query query = em.createQuery("from Account where login = :login");
+        query.setParameter("login", login);
+
+        try {
+            acc = (Account) query.getSingleResult();
+        } catch (NoResultException e) {
+            LOGGER.info("user " + login + " not found");
+        } finally {
+            return acc;
+        }
+    }
+
+    @Override
     public Account findByEmail(String email) {
         Account acc = null;
 
@@ -62,7 +78,6 @@ public class AccountDaoImpl implements AccountDao{
 
         old.setLogin(account.getLogin());
         old.setPassword(account.getPassword());
-        old.setSalt(account.getSalt());
         old.setEmail(account.getEmail());
 
         return em.merge(old);
