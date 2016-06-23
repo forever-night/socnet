@@ -20,6 +20,10 @@ public class Account implements Serializable{
     private String login;
     private String email;
 
+    @ManyToOne
+    @JoinColumn(name = "id", columnDefinition = "not null default 2")
+    private Role role;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -60,6 +64,14 @@ public class Account implements Serializable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public String getPassword() {
@@ -103,11 +115,12 @@ public class Account implements Serializable{
         return Objects.equals(login, account.login) &&
                 Objects.equals(email, account.email) &&
                 Objects.equals(password, account.password) &&
-                Objects.equals(salt, account.salt);
+                Objects.equals(salt, account.salt) &&
+                Objects.equals(role, account.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(login, email, password, salt);
+        return Objects.hash(login, email, password, salt, role);
     }
 }
