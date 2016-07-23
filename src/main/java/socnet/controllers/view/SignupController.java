@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 @Controller
+@RequestMapping("/signup")
 public class SignupController {
-    @RequestMapping(value = {"/sign_up"}, method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public String signUp() {
-        return "signUp";
+        return "signup";
     }
 }

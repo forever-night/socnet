@@ -1,4 +1,4 @@
-package socnet.beans.interfaces;
+package socnet.services.interfaces;
 
 import socnet.dto.PasswordChangeDto;
 import socnet.entities.Account;
@@ -6,10 +6,8 @@ import socnet.entities.Account;
 import java.io.IOException;
 
 
-public interface AccountBean {
+public interface AccountService {
     Account find(int id);
-
-    Account authenticate(Account account);
 
     int signUp(Account account);
 
@@ -21,11 +19,11 @@ public interface AccountBean {
 
     void remove(Account account);
 
-    int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto);
+//    int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto);
 
-    String createSalt();
+    String encodePassword(String password);
 
-    String createPasswordHash(String password, String salt);
+    boolean passwordMatches(Account account);
 
     Account fromJson(String json) throws IOException;
 }

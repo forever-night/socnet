@@ -1,18 +1,22 @@
-app.controller('SignUpCtrl', function ($scope, $http, $window, ValidateService, StatusService) {
+app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, StatusService) {
     $scope.account = new Account();
     $scope.confirmPassword = '';
 
     var status = document.getElementById('status');
+    var csrfToken = document.getElementsByName('_csrf')[0].content;
 
 
     $scope.postAccount = function(data) {
         var config = {
-            headers: {'Content-Type': 'application/json'}
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN' : csrfToken
+            }
         };
 
         var request = $http.post(restUrl.account, data, config).then(
             function success(response) {
-                $window.location.href = response.headers('Location');
+                $window.location.href = url.login + "?signup";
             },
             function error(response) {
                 StatusService.setStatus(status, false, 'Unable to sign up');
@@ -38,7 +42,6 @@ app.controller('SignUpCtrl', function ($scope, $http, $window, ValidateService, 
         }
 
         // TODO check if login is taken
-        // TODO check if email is taken
 
 
         var validatePassword = ValidateService.validateConfirmPassword($scope.account.password, $scope.confirmPassword);

@@ -5,14 +5,15 @@
 <t:template>
     <jsp:attribute name="head">
         <script src="<c:url value='/static/js/classes/account.js'/>"></script>
-        <script src="<c:url value='/static/js/signUpController.js'/>"></script>
+        <script src="<c:url value='/static/js/signupController.js'/>"></script>
         <title>sign up</title>
+        <meta name="_csrf" content="${_csrf.token}"/>
+        <meta name="_csrf_header" content="${_csrf.headerName}"/>
     </jsp:attribute>
     <jsp:body>
-        <div ng-controller="SignUpCtrl">
-            <form class="col-md-offset-4 col-md-4 form-horizontal">
-                <h2>Sign up</h2>
-
+        <div ng-controller="SignupCtrl">
+            <form class="col-md-offset-4 col-md-4 form-horizontal" method="post">
+                <h2 style="margin-bottom: 15px;">Sign up</h2>
                 <div class="form-group">
                     <label class="sr-only">Login</label>
                     <input type="text" ng-model="account.login" class="form-control" placeholder="Login"
@@ -36,7 +37,7 @@
                 <div id="status" class="alert" role="alert" style="visibility: hidden;">
                 </div>
                 <button class="btn btn-lg btn-success btn-block" ng-click="signUp()">Sign up</button>
-                <a href="${pageContext.request.contextPath}/sign_in" class="btn btn-default btn-block">I already have an
+                <a href="${pageContext.request.contextPath}/signIn" class="btn btn-default btn-block">I already have an
                     account</a>
             </form>
         </div>

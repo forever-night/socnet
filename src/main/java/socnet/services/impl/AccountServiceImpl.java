@@ -1,13 +1,15 @@
-package socnet.beans.impl;
+package socnet.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import socnet.beans.interfaces.AccountBean;
-import socnet.beans.interfaces.ProfileBean;
+import socnet.services.interfaces.AccountService;
+import socnet.services.interfaces.ProfileService;
 import socnet.dao.interfaces.AccountDao;
 import socnet.dto.PasswordChangeDto;
 import socnet.entities.Account;
@@ -15,15 +17,18 @@ import socnet.entities.Account;
 import java.io.IOException;
 
 
-@Component
-public class AccountBeanImpl implements AccountBean {
-    private static final Logger LOGGER = LogManager.getLogger(AccountBeanImpl.class);
+@Service
+public class AccountServiceImpl implements AccountService {
+    private static final Logger LOGGER = LogManager.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private AccountDao accountDao;
 
     @Autowired
-    private ProfileBean profileBean;
+    private ProfileService profileService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -33,15 +38,12 @@ public class AccountBeanImpl implements AccountBean {
         
 //        TODO check if email already used
 
-        String salt = createSalt();
-        String password = createPasswordHash(account.getPassword(), salt);
-
-        account.setSalt(salt);
+        String password = encodePassword(account.getPassword());
         account.setPassword(password);
-
+        
 
         int id = accountDao.persist(account);
-        profileBean.create(id);
+        profileService.create(id);
 
         return id;
     }
@@ -49,19 +51,6 @@ public class AccountBeanImpl implements AccountBean {
     @Override
     public Account find(int id) {
         return accountDao.find(id);
-    }
-
-    @Override
-    public Account authenticate(Account account) {
-        String hash = createPasswordHash(account.getPassword(), account.getSalt());
-        account.setPassword(hash);
-
-        if (account.getEmail() != null)
-            return accountDao.authenticateByEmail(account);
-        else if (account.getLogin() != null)
-            return accountDao.authenticateByLogin(account);
-        else
-            return null;
     }
 
     @Override
@@ -73,10 +62,7 @@ public class AccountBeanImpl implements AccountBean {
     public Account updatePassword(Account account) {
         Account old = accountDao.find(account.getId());
 
-        String salt = createSalt();
-        String password = createPasswordHash(account.getPassword(), salt);
-
-        old.setSalt(salt);
+        String password = encodePassword(account.getPassword());
         old.setPassword(password);
 
         return accountDao.update(old);
@@ -104,36 +90,38 @@ public class AccountBeanImpl implements AccountBean {
     @Override
     @Transactional
     public void remove(Account account) {
-        profileBean.remove(account.getId());
+        profileService.remove(account.getId());
         accountDao.remove(account);
     }
 
     /**
      * @return 0 if update successful, <br> 1 if old password is wrong, <br> 2 if the parameter is null
-     * */
+//     * */
+//    @Override
+//    public int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto) {
+//        if (passwordChangeDto == null)
+//            return 2;
+//
+//        Account temp = authenticate(passwordChangeDto.getAccount());
+//
+//        if (temp == null)
+//            return 1;
+//
+//        temp.setPassword(passwordChangeDto.getNewPassword());
+//        updatePassword(temp);
+//        return 0;
+//    }
+
     @Override
-    public int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto) {
-        if (passwordChangeDto == null)
-            return 2;
-
-        Account temp = authenticate(passwordChangeDto.getAccount());
-
-        if (temp == null)
-            return 1;
-
-        temp.setPassword(passwordChangeDto.getNewPassword());
-        updatePassword(temp);
-        return 0;
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     @Override
-    public String createSalt() {
-        return "";
-    }
+    public boolean passwordMatches(Account account) {
+        Account temp = accountDao.findByLogin(account.getLogin());
 
-    @Override
-    public String createPasswordHash(String password, String salt) {
-        return password;
+        return temp != null && passwordEncoder.matches(account.getPassword(), temp.getPassword());
     }
 
     @Override

@@ -1,12 +1,11 @@
 package socnet.util;
 
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.UrlBasedViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 
 public class TestUtil {
-    public static UrlBasedViewResolver configureViewResolver() {
-        UrlBasedViewResolver viewResolver = new UrlBasedViewResolver();
+    public static InternalResourceViewResolver configureViewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/WEB-INF/views");
         viewResolver.setSuffix(".jsp");
         viewResolver.setViewClass(org.springframework.web.servlet.view.JstlView.class);

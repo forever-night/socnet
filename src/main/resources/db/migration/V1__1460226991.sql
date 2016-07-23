@@ -3,9 +3,6 @@ create table account (
   login varchar(24),
   email varchar(128),
   password varchar(128),
-  salt varchar(128),
-  private_key varchar(64),
-  public_key varchar(64),
   created_at timestamptz,
   version int
 );

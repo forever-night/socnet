@@ -8,6 +8,8 @@ import java.util.List;
 public interface AccountDao {
     Account find(int id);
 
+    Account findByLogin(String login);
+
     Account findByEmail(String email);
 
     List<Account> findAll();
@@ -17,8 +19,4 @@ public interface AccountDao {
     Account update(Account account);
 
     void remove(Account account);
-
-    Account authenticateByEmail(Account account);
-    
-    Account authenticateByLogin(Account account);
 }
