@@ -17,7 +17,7 @@ import java.util.Properties;
 
 
 @Configuration
-@Import({WebConfig.class, DataConfig.class})
+@Import({WebConfig.class, DataConfig.class, WebSecurityConfig.class})
 @ComponentScan("socnet")
 @EnableTransactionManagement
 public class AppConfig {

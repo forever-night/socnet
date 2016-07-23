@@ -10,7 +10,6 @@
         <param-name>contextClass</param-name>
         <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
     </context-param>
-
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>socnet.config.AppConfig</param-value>
@@ -19,6 +18,15 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
         <servlet-name>dispatcher</servlet-name>
@@ -33,14 +41,13 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
-        <welcome-file>/sign_in</welcome-file>
+        <welcome-file>/login</welcome-file>
     </welcome-file-list>
 
     <resource-env-ref>
