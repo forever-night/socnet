@@ -25,13 +25,14 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="<c:url value='/'/>">Home</a></li>
-                <li><a href="<c:url value='/profile/{{id}}'/>">Profile</a></li>
+                <li><a href="${pageContext.request.contextPath}/profile">Profile</a></li>
+                <li><a href="${pageContext.request.contextPath}/settings">Settings</a></li>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li id="btn_sign_in" ng-hide="authorized"><a href="<c:url value='/sign_in'/>">Sign in</a></li>
-                <li id="btn_sign_out"
-                    ng-show="authorized"><a href="<c:url value='/sign_out'/>">Sign out</a></li>
-            </ul>
+            <form action="${pageContext.request.contextPath}/logout" method="post"
+                  class="navbar-form navbar-right">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                <button type="submit" class="btn btn-warning">Log Out</button>
+            </form>
         </div>
     </div>
 </nav>

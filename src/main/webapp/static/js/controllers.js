@@ -1,13 +1,16 @@
 app = angular.module('app', []);
 
 url = {
-    signIn: '/socnet/sign_in/',
-    profile: '/socnet/profile/'
+    login: '/socnet/login',
+    profile: '/socnet/profile',
+    settings: '/socnet/settings',
+    error: '/socnet/error',
+    logout: '/socnet/logout'
 };
 
 restUrl = {
-    profile: '/socnet/api/profile/',
-    account: '/socnet/api/account/'
+    profile: '/socnet/api/profile',
+    account: '/socnet/api/account'
 };
 
 configJson = {

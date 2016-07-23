@@ -8,6 +8,6 @@
         <li><h6><a href="${pageContext.request.contextPath}/private">Messages</a></h6></li>
         <li><h6><a href="${pageContext.request.contextPath}/followers">Followers</a></h6></li>
         <li><h6><a href="${pageContext.request.contextPath}/communities">Communities</a></h6></li>
-        <li><h6><a href="${pageContext.request.contextPath}/settings/">Settings</a></h6></li>
+        <li><h6><a href="${pageContext.request.contextPath}/settings">Settings</a></h6></li>
     </ul>
 </div>
