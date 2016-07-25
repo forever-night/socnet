@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ProfileDao {
     Profile find(int id);
+    
+    Profile findByLogin(String login);
 
     List<Profile> findAll();
 

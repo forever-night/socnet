@@ -1,17 +1,24 @@
 package socnet.dao.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Profile;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.util.Date;
 import java.util.List;
 
 
 @Component
 public class ProfileDaoImpl implements ProfileDao{
+    private static final Logger LOGGER = LogManager.getLogger(ProfileDaoImpl.class);
+    
     @PersistenceContext
     private EntityManager em;
 
@@ -19,7 +26,24 @@ public class ProfileDaoImpl implements ProfileDao{
     public Profile find(int id) {
         return em.find(Profile.class, id);
     }
-
+    
+    @Override
+    public Profile findByLogin(String login) {
+        Profile profile = null;
+        
+        Query query = em.createQuery("from Profile p where p.id = (" +
+                "select a.id from Account a where a.login = :login)");
+        query.setParameter("login", login);
+        
+        try {
+            profile = (Profile) query.getSingleResult();
+        } catch (NoResultException e) {
+            LOGGER.info("profile " + login + " not found");
+        } finally {
+            return profile;
+        }
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     public List<Profile> findAll() {

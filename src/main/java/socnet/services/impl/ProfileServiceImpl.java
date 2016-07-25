@@ -1,16 +1,17 @@
-package socnet.beans.impl;
+package socnet.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import socnet.beans.interfaces.ProfileBean;
+import org.springframework.stereotype.Service;
+import socnet.services.interfaces.ProfileService;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Profile;
 
 import java.util.List;
 
 
-@Component
-public class ProfileBeanImpl implements ProfileBean {
+@Service
+public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private ProfileDao profileDao;
 
@@ -18,7 +19,12 @@ public class ProfileBeanImpl implements ProfileBean {
     public Profile find(int id) {
         return profileDao.find(id);
     }
-
+    
+    @Override
+    public Profile findByLogin(String login) {
+        return profileDao.findByLogin(login);
+    }
+    
     @Override
     public List<Profile> findAll() {
         return profileDao.findAll();

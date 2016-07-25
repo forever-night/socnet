@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import socnet.beans.interfaces.ProfileBean;
 import socnet.entities.Profile;
+import socnet.services.interfaces.ProfileService;
 
 import java.net.URI;
 import java.util.List;
@@ -18,17 +18,17 @@ import java.util.List;
 @RequestMapping("/api/profile")
 public class ProfileRestController {
     @Autowired
-    ProfileBean profileBean;
+    ProfileService profileService;
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Profile> getProfileList() {
-        return profileBean.findAll();
+        return profileService.findAll();
     }
-
-    @RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Profile getProfileById(@PathVariable int id) {
-        if (id > 0)
-            return profileBean.find(id);
+    
+    @RequestMapping(path = "/{login}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Profile getProfileByLogin(@PathVariable String login) {
+        if (login != null && !login.isEmpty())
+            return profileService.findByLogin(login);
         else
             return null;
     }
@@ -38,7 +38,7 @@ public class ProfileRestController {
         if (profile == null || id != profile.getId())
             return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
         else {
-            profile = profileBean.update(profile);
+            profile = profileService.update(profile);
 
             URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/profile/{id}").buildAndExpand(id).toUri();

@@ -5,7 +5,7 @@
 <t:template>
     <jsp:attribute name="head">
         <script>
-            var profileId =<c:out value='${profileId}'/>;
+            var login = "<c:out value='${login}'/>";
         </script>
         <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
         <script src="<c:url value='/static/js/profileController.js'/>"></script>

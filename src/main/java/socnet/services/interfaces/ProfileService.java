@@ -1,12 +1,14 @@
-package socnet.beans.interfaces;
+package socnet.services.interfaces;
 
 import socnet.entities.Profile;
 
 import java.util.List;
 
 
-public interface ProfileBean {
+public interface ProfileService {
     Profile find(int id);
+    
+    Profile findByLogin(String login);
 
     List<Profile> findAll();
 
