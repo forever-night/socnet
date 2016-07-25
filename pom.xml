@@ -21,6 +21,7 @@
         <java.jstl.version>1.2</java.jstl.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.0.62-beta</mockito.version>
+        <commons-dbcp.version>1.4</commons-dbcp.version>
     </properties>
 
     <dependencies>
@@ -142,6 +143,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${commons-dbcp.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
