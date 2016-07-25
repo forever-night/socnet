@@ -22,7 +22,7 @@
             <a class="navbar-brand" href="<c:url value='/'/>">SocNet</a>
         </div>
 
-        <div class="collapse navbar-collapse">
+        <div>
             <ul class="nav navbar-nav">
                 <li class="active"><a href="<c:url value='/'/>">Home</a></li>
                 <li><a href="${pageContext.request.contextPath}/profile">Profile</a></li>

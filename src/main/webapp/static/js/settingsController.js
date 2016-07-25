@@ -7,22 +7,32 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
     var persistentProfile = new Profile();
 
-    var statusProfile = document.getElementById('statusProfile');
-    var statusEmail = document.getElementById('statusEmail');
-    var statusPassword = document.getElementById('statusPassword');
-    var tabProfile = document.getElementById('tabProfile');
-    var tabAccount = document.getElementById('tabAccount');
+    var statusElement = {
+        profile : document.getElementById('statusProfile'),
+        email : document.getElementById('statusEmail'),
+        password : document.getElementById('statusPassword'),
+        delete : document.getElementById('statusDelete')
+    };
 
-    var updatedAccountId, updatePasswordStatus;
+    var tab = {
+        profile : document.getElementById('tabProfile'),
+        account : document.getElementById('tabAccount')
+    };
 
 
-    statusProfile.style.visibility = 'hidden';
-    statusEmail.style.visibility = 'hidden';
-    statusPassword.style.visibility = 'hidden';
+    var emailUpdateStatus, passwordUpdateStatus, deleteStatus;
+
+    var csrfToken = document.getElementsByName('_csrf')[0].content;
+
+
+    statusElement.profile.style.visibility = 'hidden';
+    statusElement.email.style.visibility = 'hidden';
+    statusElement.password.style.visibility = 'hidden';
+    statusElement.delete.style.visibility = 'hidden';
 
 
     $scope.getProfile = function () {
-        return $http.get(restUrl.profile + profileId).then(
+        return $http.get(restUrl.profile + "/" + login).then(
             function (response) {
                 var data = response.data;
 
@@ -36,22 +46,33 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                         data.currentCity,
                         data.info
                     );
+            },
+            function () {
+                $window.location.href = url.error;
             }
         );
     };
 
     $scope.putProfile = function (data) {
-        return $http.put(restUrl.profile + $scope.profile.id, data, configJson);
+        var config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN' : csrfToken
+            }
+        };
+
+        return $http.put(restUrl.profile + "/" + $scope.profile.id, data, config);
     };
 
     $scope.getAccount = function () {
-        return $http.get(restUrl.account + profileId).then(
+        return $http.get(restUrl.account + "/" + login).then(
             function (response) {
                 var data = response.data;
 
                 if (data != null)
                     $scope.account = new Account(
                         data.id,
+                        data.login,
                         data.email);
 
                 $scope.newAccount = copy($scope.account);
@@ -60,44 +81,90 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
     };
 
     $scope.putAccountEmail = function (data) {
-        return $http.put(restUrl.account + profileId + '/email', data, configJson).then(
-            function (response) {
-                if (response.data != null)
-                    updatedAccountId = response.data;
+        var config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN' : csrfToken
+            }
+        };
+
+
+        return $http.put(restUrl.account + "/" + login + '/email', data, config).then(
+            function success(response) {
+                if (response.status == 200)
+                    emailUpdateStatus = 1;
+            },
+            function error(response) {
+                if (response.status == 403)
+                    $window.location.href = url.accessDenied;
+                else
+                    emailUpdateStatus = -1;
             }
         );
     };
 
     $scope.putAccountPassword = function (data) {
-        return $http.put(restUrl.account + profileId + '/password', data, configJson).then(
-            function (response) {
-                if (response.data != null)
-                    updatePasswordStatus = response.data;
+        var config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN' : csrfToken
+            }
+        };
+
+        return $http.put(restUrl.account + "/" + login + '/password', data, config).then(
+            function success(response) {
+                if (response.status == 200)
+                    passwordUpdateStatus = 1;
+            },
+            function error(response) {
+                if (response.status == 403)
+                    $window.location.href = url.accessDenied;
+                else
+                    passwordUpdateStatus = -1;
             }
         );
     };
 
     $scope.removeAccount = function () {
-        return $http.delete(restUrl.account + profileId);
+        var config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN' : csrfToken
+            }
+        };
+
+        $http.delete(restUrl.account + "/" + $scope.account.id + "?login=" + login, config).then(
+            function success(response) {
+                if (response.status == 200)
+                    deleteStatus = 1;
+            },
+            function error(response) {
+                if (response.status == 403)
+                    $window.location.href = url.accessDenied;
+                else
+                    deleteStatus = -1;
+            }
+        );
     };
 
     $scope.setProfileSelected = function (value) {
         $scope.profileSelected = value;
         $scope.accountSelected = !value;
 
-        tabProfile.setAttribute('class', 'active');
-        tabAccount.removeAttribute('class');
+        tab.profile.setAttribute('class', 'active');
+        tab.account.removeAttribute('class');
 
-        statusProfile.style.visibility = 'hidden';
-        statusEmail.style.visibility = 'hidden';
-        statusPassword.style.visibility = 'hidden';
+        statusElement.profile.style.visibility = 'hidden';
+        statusElement.email.visibility = 'hidden';
+        statusElement.password.style.visibility = 'hidden';
+        statusElement.delete.style.visibility = 'hidden';
 
 
         $scope.getProfile().then(
             function () {
                 persistentProfile = copyTo($scope.profile, persistentProfile);
 
-                statusProfile.style.visibility = 'hidden';
+                statusElement.profile.style.visibility = 'hidden';
             }
         );
     };
@@ -106,12 +173,13 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         $scope.accountSelected = value;
         $scope.profileSelected = !value;
 
-        tabAccount.setAttribute('class', 'active');
-        tabProfile.removeAttribute('class');
+        tab.account.setAttribute('class', 'active');
+        tab.profile.removeAttribute('class');
 
-        statusProfile.style.visibility = 'hidden';
-        statusEmail.style.visibility = 'hidden';
-        statusPassword.style.visibility = 'hidden';
+        statusElement.profile.style.visibility = 'hidden';
+        statusElement.email.style.visibility = 'hidden';
+        statusElement.password.style.visibility = 'hidden';
+        statusElement.delete.style.visibility = 'hidden';
 
 
         $scope.getAccount();
@@ -120,7 +188,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
     $scope.resetForm = function () {
         $scope.profile = copyTo(persistentProfile, $scope.profile);
 
-        statusProfile.style.visibility = 'hidden';
+        statusElement.profile.style.visibility = 'hidden';
     };
 
     $scope.saveForm = function () {
@@ -129,24 +197,25 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
         $scope.putProfile($scope.profile).then(
             function () {
-                StatusService.setStatus(statusProfile, true, 'Success!');
+                StatusService.setStatus(statusElement.profile, true, 'Success!');
                 persistentProfile = copyTo($scope.profile, persistentProfile);
             },
             function () {
-                StatusService.setStatus(statusProfile, false, 'error in updating profile');
+                StatusService.setStatus(statusElement.profile, false, 'Error! Try again later');
             }
         );
     };
 
     $scope.changeEmail = function () {
-        statusPassword.style.visibility = 'hidden';
+        statusElement.password.style.visibility = 'hidden';
+        statusElement.delete.style.visibility = 'hidden';
 
 
         if ($scope.account == null)
             return;
 
         if ($scope.newAccount.email == null) {
-            StatusService.setStatus(statusEmail, false, 'field is empty');
+            StatusService.setStatus(statusElement.email, false, 'Field is empty');
             return;
         }
 
@@ -154,27 +223,36 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         var validated = ValidateService.validateEmail($scope.newAccount.email);
 
         if (!validated) {
-            StatusService.setStatus(statusEmail, false, 'unacceptable e-mail format');
+            StatusService.setStatus(statusElement.email, false, 'Unacceptable e-mail format');
             return;
         }
 
-        // TODO check if email is taken
+
+        if ($scope.newAccount.email == $scope.account.email) {
+            StatusService.setStatus(statusElement.email, true, 'E-mail is the same.');
+            return;
+        }
 
 
         $scope.putAccountEmail($scope.newAccount).then(
             function () {
-                if (updatedAccountId != null && updatedAccountId > 0) {
-                    StatusService.setStatus(statusEmail, true, 'Success!');
+                if (emailUpdateStatus != null && emailUpdateStatus > 0) {
+                    StatusService.setStatus(statusElement.email, true, 'Success!');
                     $scope.account.email = $scope.newAccount.email;
-                } else
-                    StatusService.setStatus(statusEmail, false, 'error in updating e-mail');
+                }
 
-                updatedAccountId = null;
+                emailUpdateStatus = null;
+            },
+            function () {
+                StatusService.setStatus(statusElement.email, false, 'Error in updating e-mail');
+
+                emailUpdateStatus = null;
             });
     };
 
     $scope.changePassword = function () {
-        statusEmail.style.visibility = 'hidden';
+        statusElement.email.style.visibility = 'hidden';
+        statusElement.delete.style.visibility = 'hidden';
 
 
         var oldPassword = document.getElementById('inputOldPassword').value;
@@ -189,58 +267,48 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
         $scope.account.password = oldPassword;
 
-        var passwordChangeDto = {
-            account: $scope.account,
-            newPassword: newPassword
-        };
+        var newAccount = copy($scope.account);
+        newAccount.password = newPassword;
 
 
-        $scope.putAccountPassword(passwordChangeDto).then(
+        $scope.putAccountPassword(newAccount).then(
             function () {
-                switch (updatePasswordStatus) {
-                    case 0:
-                        StatusService.setStatus(statusPassword, true, 'Success!');
-                        document.getElementById('inputOldPassword').value = '';
-                        document.getElementById('inputNewPassword').value = '';
-                        document.getElementById('inputConfirmPassword').value = '';
-                        $scope.account.password = '';
-                        break;
-                    case 1:
-                        StatusService.setStatus(statusPassword, false, 'wrong password');
-                        break;
-                    case 2:
-                        StatusService.setStatus(statusPassword, false, "can't authenticate");
-                        break;
-                    default:
-                        StatusService.setStatus(statusPassword, false, 'unexpected error');
-                        break;
-                }
+                if (passwordUpdateStatus != null && passwordUpdateStatus > 0)
+                    StatusService.setStatus(statusElement.password, true, 'Success!');
 
-                updatePasswordStatus = null;
+                passwordUpdateStatus = null;
+            },
+            function() {
+                StatusService.setStatus(statusElement.password, false, 'Error in updating password!');
+                passwordUpdateStatus = null;
             });
     };
 
     $scope.deleteAccount = function () {
-        StatusService.hideStatus(statusEmail);
-        StatusService.hideStatus(statusPassword);
-        // statusEmail.style.visibility = 'hidden';
-        // statusPassword.style.visibility = 'hidden';
+        StatusService.hideStatus(statusElement.email);
+        StatusService.hideStatus(statusElement.password);
 
 
         var confirm = window.confirm("Delete account?");
 
         if (confirm) {
             $scope.removeAccount().then(
-                function () {
-                    $window.location.href = url.signIn;
-                }
-            );
+                function() {
+                    if (deleteStatus != null && deleteStatus > 0)
+                        $http.post(url.logout, "", config);
+
+                    deleteStatus = null;
+                },
+                function() {
+                    StatusService.setStatus(statusElement.delete, false, 'Account not found!');
+                    deleteStatus = null;
+                });
         }
     };
 
     $scope.validatePassword = function (oldPassword, newPassword, confirmPassword) {
         if (oldPassword == '' || newPassword == '' || confirmPassword == '') {
-            StatusService.setStatus(statusPassword, false, 'one of the fields is empty');
+            StatusService.setStatus(statusElement.password, false, 'One of the fields is empty');
             return false;
         }
 
@@ -249,19 +317,10 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         if (validateConfirmPassword)
             return true;
         else {
-            StatusService.setStatus(statusPassword, false, 'new password and confirm password should match');
+            StatusService.setStatus(statusElement.password, false, 'Passwords should match');
             return false;
         }
     };
-
-    // $scope.setStatus = function (statusElement, isSuccessful, message) {
-    //     var elementClass = 'alert';
-    //     elementClass += isSuccessful ? ' alert-success' : ' alert-danger';
-    //
-    //     statusElement.style.visibility = 'visible';
-    //     statusElement.innerHTML = message;
-    //     statusElement.setAttribute('class', elementClass);
-    // };
 
 
     $scope.setProfileSelected(true);

@@ -3,29 +3,40 @@ package socnet.controllers.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import socnet.beans.interfaces.ProfileBean;
-import socnet.entities.Profile;
+import socnet.services.interfaces.ProfileService;
+import socnet.services.interfaces.UserService;
 
 
 @Controller
 @RequestMapping(value = "/settings")
 public class SettingsController {
     @Autowired
-    ProfileBean profileBean;
+    ProfileService profileService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public String settings(@PathVariable int id, Model model) {
-        Profile profile = profileBean.find(id);
+    @Autowired
+    UserService userService;
+    
+    public SettingsController() {}
+    
+    /**
+     * Used in tests for mocks.
+     * */
+    public SettingsController(ProfileService profileService, UserService userService) {
+        this.profileService = profileService;
+        this.userService = userService;
+    }
 
-        if (profile != null) {
-            model.addAttribute("profileId", id);
+    @RequestMapping(method = RequestMethod.GET)
+    public String settings(Model model) {
+        String login = userService.getCurrentLogin();
+    
+        if (login == null)
+            return "403";
+        else {
+            model.addAttribute("login", login);
             return "settings";
-        } else {
-            model.addAttribute("errorMessage", "User not found");
-            return "error";
         }
     }
 }

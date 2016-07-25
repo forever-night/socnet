@@ -15,7 +15,7 @@
         <t:owner></t:owner>
         <div ng-controller="ProfileCtrl">
             <t:main_panel>
-            <jsp:attribute name="panel_title">{{profile.name}}</jsp:attribute>
+            <jsp:attribute name="panel_title"><strong>{{profile.name}}</strong></jsp:attribute>
             <jsp:attribute name="panel_body">
             <div>
                 <div>

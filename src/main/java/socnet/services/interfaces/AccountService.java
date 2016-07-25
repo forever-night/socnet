@@ -1,6 +1,5 @@
 package socnet.services.interfaces;
 
-import socnet.dto.PasswordChangeDto;
 import socnet.entities.Account;
 
 import java.io.IOException;
@@ -8,18 +7,23 @@ import java.io.IOException;
 
 public interface AccountService {
     Account find(int id);
+    
+    Account findByLogin(String login);
 
     int signUp(Account account);
 
     Account update(Account account);
 
-    Account updatePassword(Account account);
-
     Account updateEmail(Account account);
 
-    void remove(Account account);
+    Account updatePassword(Account account);
 
-//    int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto);
+    /**
+     * @return -1 if account does not exist,</br>
+     *     0 if account is removed successfully,</br>
+     *     1 if account is not the same as persistent account with the same ID.
+     * */
+    int remove(Account account);
 
     String encodePassword(String password);
 

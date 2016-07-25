@@ -5,12 +5,14 @@
 <t:template>
     <jsp:attribute name="head">
         <script>
-            var profileId =<c:out value='${profileId}'/>;
+            var login = "<c:out value='${login}'/>";
         </script>
         <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
         <script src="<c:url value='/static/js/classes/account.js'/>"></script>
         <script src="<c:url value='/static/js/settingsController.js'/>"></script>
         <title>settings</title>
+        <meta name="_csrf" content="${_csrf.token}"/>
+        <meta name="_csrf_header" content="${_csrf.headerName}"/>
     </jsp:attribute>
     <jsp:body>
         <t:owner></t:owner>
@@ -109,6 +111,8 @@
                                     <button class="btn btn-sm btn-danger" ng-click="deleteAccount()">Delete account
                                     </button>
                                 </div>
+                                <div id="statusDelete" class="alert" role="alert"
+                                     style="visibility: hidden; margin-top:10px;"></div>
                             </li>
                         </ul>
                     </div>

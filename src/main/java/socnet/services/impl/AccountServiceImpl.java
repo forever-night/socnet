@@ -5,14 +5,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import socnet.dao.interfaces.AccountDao;
+import socnet.entities.Account;
 import socnet.services.interfaces.AccountService;
 import socnet.services.interfaces.ProfileService;
-import socnet.dao.interfaces.AccountDao;
-import socnet.dto.PasswordChangeDto;
-import socnet.entities.Account;
 
 import java.io.IOException;
 
@@ -36,8 +34,6 @@ public class AccountServiceImpl implements AccountService {
         if (account.getId() != null)
             account.setId(null);
         
-//        TODO check if email already used
-
         String password = encodePassword(account.getPassword());
         account.setPassword(password);
         
@@ -52,65 +48,61 @@ public class AccountServiceImpl implements AccountService {
     public Account find(int id) {
         return accountDao.find(id);
     }
-
+    
+    @Override
+    public Account findByLogin(String login) {
+        if (login == null || login.isEmpty())
+            return null;
+        
+        return accountDao.findByLogin(login);
+    }
+    
     @Override
     public Account update(Account account) {
         return accountDao.update(account);
     }
 
     @Override
-    public Account updatePassword(Account account) {
-        Account old = accountDao.find(account.getId());
-
-        String password = encodePassword(account.getPassword());
-        old.setPassword(password);
-
-        return accountDao.update(old);
-    }
-
-    @Override
     @Transactional
     public Account updateEmail(Account account) {
-        Account accountWithEmail = accountDao.findByEmail(account.getEmail());
-        Account old = accountDao.find(account.getId());
+        Account oldAccount = accountDao.findByLogin(account.getLogin());
+        
+        if (oldAccount.getEmail().equals(account.getEmail()))
+            return oldAccount;
+        else
+            return accountDao.update(account);
+    }
+    
+    @Override
+    @Transactional
+    public Account updatePassword(Account account) {
+        Account oldAccount = accountDao.findByLogin(account.getLogin());
 
-        if (old.getEmail().equals(account.getEmail()))
-            return null;
-
-        if (accountWithEmail == null) {
-            old.setEmail(account.getEmail());
-
-            return accountDao.update(old);
-        }
-
-        // account with this email already exists
-        return null;
+        String password = encodePassword(account.getPassword());
+        
+        if (oldAccount.getPassword().equals(password))
+            return oldAccount;
+        
+        oldAccount.setPassword(password);
+        return accountDao.update(oldAccount);
     }
 
     @Override
     @Transactional
-    public void remove(Account account) {
-        profileService.remove(account.getId());
-        accountDao.remove(account);
+    public int remove(Account account) {
+        Account persistent = accountDao.find(account.getId());
+        
+        if (persistent == null)
+            return -1;
+        
+        if (persistent.getLogin().equals(account.getLogin())) {
+            profileService.remove(account.getId());
+            accountDao.remove(account);
+            
+            return 0;
+        } else
+            return 1;
     }
-
-    /**
-     * @return 0 if update successful, <br> 1 if old password is wrong, <br> 2 if the parameter is null
-//     * */
-//    @Override
-//    public int authenticateAndUpdatePassword(PasswordChangeDto passwordChangeDto) {
-//        if (passwordChangeDto == null)
-//            return 2;
-//
-//        Account temp = authenticate(passwordChangeDto.getAccount());
-//
-//        if (temp == null)
-//            return 1;
-//
-//        temp.setPassword(passwordChangeDto.getNewPassword());
-//        updatePassword(temp);
-//        return 0;
-//    }
 
     @Override
     public String encodePassword(String password) {

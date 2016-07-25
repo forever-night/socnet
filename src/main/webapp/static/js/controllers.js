@@ -5,7 +5,8 @@ url = {
     profile: '/socnet/profile',
     settings: '/socnet/settings',
     error: '/socnet/error',
-    logout: '/socnet/logout'
+    logout: '/socnet/logout',
+    accessDenied: '/socnet/403'
 };
 
 restUrl = {

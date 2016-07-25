@@ -14,70 +14,73 @@ import socnet.services.interfaces.AccountService;
 @RestController
 @RequestMapping("/api/account")
 public class AccountRestController {
-    private static final Logger LOGGER = LogManager.getLogger(AccountRestController.class);
-    
     @Autowired
     private AccountService accountService;
     
     @RequestMapping(path = "/{login}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Account getAccountByLogin(@PathVariable String login) {
-//        TODO: get account by login
-        return null;
+        if (login != null && !login.isEmpty())
+            return accountService.findByLogin(login);
+        else
+            return null;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Integer> signUp(@RequestBody Account account) {
-        LOGGER.info("request to create " + account);
-        
+    public ResponseEntity signUp(@RequestBody Account account) {
         if (account == null)
-            return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         else if (account.getLogin() != null && account.getPassword() != null) {
             Integer id = accountService.signUp(account);
             account.setId(id);
-            
-            LOGGER.info("created " + account);
 
-            return new ResponseEntity<Integer>(HttpStatus.CREATED);
+            return new ResponseEntity(HttpStatus.CREATED);
         } else
-            return new ResponseEntity<Integer>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @RequestMapping(path = "/{id}/email", method = RequestMethod.PUT)
-    public ResponseEntity<Integer> updateEmail(@RequestBody Account account, @PathVariable int id) {
-        if (account == null || id != account.getId() || account.getEmail() == null)
-            return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
-        else {
-            account = accountService.updateEmail(account);
-
-            if (account != null)
-                return new ResponseEntity<Integer>(account.getId(), HttpStatus.OK);
-            else
-                return new ResponseEntity<Integer>(0, HttpStatus.OK);
-        }
+    @RequestMapping(path = "/{login}/email", method = RequestMethod.PUT)
+    public ResponseEntity updateEmail(@RequestBody Account account, @PathVariable String login) {
+        if (account == null || login == null)
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        
+        if (!login.equals(account.getLogin()))
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        
+        accountService.updateEmail(account);
+        return new ResponseEntity(HttpStatus.OK);
     }
-
-//    @RequestMapping(path = "{id}/password", method = RequestMethod.PUT)
-//    public ResponseEntity<Integer> updatePassword(@RequestBody PasswordChangeDto passwordChangeDto,
-//                                                  @PathVariable int id) {
-//        if (passwordChangeDto == null || passwordChangeDto.getAccount().getId() != id)
-//            return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
-//        else {
-//            int updateStatus = accountService.authenticateAndUpdatePassword(passwordChangeDto);
-//
-//            return new ResponseEntity<Integer>(updateStatus, HttpStatus.OK);
-//        }
-//    }
+    
+    @RequestMapping(path = "/{login}/password", method = RequestMethod.PUT)
+    public ResponseEntity updatePassword(@RequestBody Account account, @PathVariable String login) {
+        if (account == null || login == null)
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        
+        if (!login.equals(account.getLogin()))
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        
+        accountService.updatePassword(account);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Integer> delete(@PathVariable int id) {
-        if (id != 0) {
-            Account account = new Account();
-            account.setId(id);
-
-            accountService.remove(account);
-
-            return new ResponseEntity<Integer>(id, HttpStatus.OK);
-        } else
-            return new ResponseEntity<Integer>(id, HttpStatus.BAD_REQUEST);
+    public ResponseEntity delete(@PathVariable int id, @RequestParam String login) {
+        if (id < 1)
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        
+        Account account = new Account();
+        account.setId(id);
+        account.setLogin(login);
+        
+        int status = accountService.remove(account);
+        
+        switch (status) {
+            case 0:
+                return new ResponseEntity(HttpStatus.OK);
+            case 1:
+                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            
+            default:
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
     }
 }
