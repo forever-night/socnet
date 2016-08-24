@@ -74,9 +74,13 @@ public class AccountDaoImpl implements AccountDao{
     @Override
     @Transactional
     public Account update(Account account) {
-        Account old = em.find(Account.class, account.getId());
+        Account old;
+        
+        if (account.getId() != null)
+            old = em.find(Account.class, account.getId());
+        else
+            old = findByLogin(account.getLogin());
 
-        old.setLogin(account.getLogin());
         old.setPassword(account.getPassword());
         old.setEmail(account.getEmail());
 

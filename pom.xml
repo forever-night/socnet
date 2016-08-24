@@ -17,6 +17,7 @@
         <postgresql.version>9.4.1208</postgresql.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
         <log4j.version>2.3</log4j.version>
+        <selma.version>0.15</selma.version>
         <java.servlet.version>3.1.0</java.servlet.version>
         <java.jstl.version>1.2</java.jstl.version>
         <junit.version>4.12</junit.version>
@@ -115,6 +116,18 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.xebia.extras</groupId>
+            <artifactId>selma-processor</artifactId>
+            <version>${selma.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.xebia.extras</groupId>
+            <artifactId>selma</artifactId>
+            <version>${selma.version}</version>
         </dependency>
 
         <dependency>

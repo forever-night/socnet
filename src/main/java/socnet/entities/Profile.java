@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "profile")
-@JsonIgnoreProperties({"version", "sentPrivate", "receivedPrivate", "sentPublic", "receivedPublic"})
+//@JsonIgnoreProperties({"version", "sentPrivate", "receivedPrivate", "sentPublic", "receivedPublic"})
 public class Profile implements Serializable {
     @Id @Column(name = "account_id")
     private Integer id;
@@ -158,7 +158,7 @@ public class Profile implements Serializable {
     public String toString() {
         return "Profile{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name=" + name +
                 ", birthDate=" + dateOfBirth +
                 '}';
     }

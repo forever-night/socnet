@@ -72,7 +72,27 @@ public class ProfileDaoImpl implements ProfileDao{
 
         return em.merge(old);
     }
-
+    
+    @Override
+    @Transactional
+    public Profile update(Profile profile, String login) {
+        Profile old;
+        
+        if (profile.getId() != null)
+            old = em.find(Profile.class, profile.getId());
+        else
+            old = findByLogin(login);
+    
+        old.setName(profile.getName());
+        old.setDateOfBirth(profile.getDateOfBirth());
+        old.setCountry(profile.getCountry());
+        old.setCurrentCity(profile.getCurrentCity());
+        old.setPhone(profile.getPhone());
+        old.setInfo(profile.getInfo());
+        
+        return em.merge(old);
+    }
+    
     @Override
     public void remove(Integer id) {
         Profile old = em.find(Profile.class, id);

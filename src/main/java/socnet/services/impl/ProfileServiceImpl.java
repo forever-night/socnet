@@ -1,11 +1,10 @@
 package socnet.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import socnet.services.interfaces.ProfileService;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Profile;
+import socnet.services.interfaces.ProfileService;
 
 import java.util.List;
 
@@ -44,7 +43,12 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile update(Profile profile) {
         return profileDao.update(profile);
     }
-
+    
+    @Override
+    public Profile update(Profile profile, String login) {
+        return profileDao.update(profile, login);
+    }
+    
     @Override
     public void remove(Integer id) {
         profileDao.remove(id);

@@ -15,6 +15,8 @@ public interface ProfileDao {
     Integer persist(Profile profile);
 
     Profile update(Profile profile);
+    
+    Profile update(Profile profile, String login);
 
     void remove(Integer id);
 

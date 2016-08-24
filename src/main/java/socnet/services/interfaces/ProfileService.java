@@ -15,6 +15,8 @@ public interface ProfileService {
     Profile create(int accountId);
 
     Profile update(Profile profile);
+    
+    Profile update(Profile profile, String login);
 
     void remove(Integer id);
 

@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "account")
-@JsonIgnoreProperties(value = {"version"}, ignoreUnknown = true)
+//@JsonIgnoreProperties(value = {"version"}, ignoreUnknown = true)
 public class Account implements Serializable{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
@@ -23,7 +23,7 @@ public class Account implements Serializable{
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name="created_at")
@@ -101,8 +101,9 @@ public class Account implements Serializable{
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", login='" + login + '\'' +
-                ", email='" + email + '\'' +
+                ", login=" + login +
+                ", email=" + email +
+                ", role=" + role.getRoleTitle() +
                 '}';
     }
 
