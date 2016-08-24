@@ -2,7 +2,6 @@ package socnet.controllers.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import socnet.dto.AccountDto;
@@ -27,9 +26,10 @@ public class AccountRestController {
     public AccountRestController() {}
     
 //    for tests
-    public AccountRestController(AccountService accountService, AccountMapper accountMapper) {
+    public AccountRestController(AccountService accountService, AccountMapper accountMapper, UserService userService) {
         this.accountService = accountService;
         this.accountMapper = accountMapper;
+        this.userService = userService;
     }
     
     

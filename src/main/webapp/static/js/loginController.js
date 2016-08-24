@@ -10,6 +10,10 @@ app.controller('LoginCtrl', function($scope, StatusService) {
         StatusService.setStatus(status, true, "Account created successfully!");
     };
 
+    $scope.deleteSuccessful = function() {
+        StatusService.setStatus(status, true, "Account deleted successfully!");
+    }
+
     $scope.loginError = function() {
         StatusService.setStatus(status, false, "Invalid login or password.");
     };

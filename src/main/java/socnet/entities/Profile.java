@@ -1,7 +1,5 @@
 package socnet.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +10,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "profile")
-//@JsonIgnoreProperties({"version", "sentPrivate", "receivedPrivate", "sentPublic", "receivedPublic"})
 public class Profile implements Serializable {
     @Id @Column(name = "account_id")
     private Integer id;

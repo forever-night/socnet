@@ -25,7 +25,7 @@
                         <dt>Country:</dt>
                         <dd>{{profile.country}}</dd>
                         <dt>City:</dt>
-                        <dd>{{profile.currentCity}}</dd>
+                        <dd>{{profile.city}}</dd>
                         <dt>Phone:</dt>
                         <dd>{{profile.phone}}</dd>
                         <dt>Info:</dt>

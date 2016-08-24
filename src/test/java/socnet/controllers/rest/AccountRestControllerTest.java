@@ -14,6 +14,7 @@ import socnet.dto.AccountDto;
 import socnet.entities.Account;
 import socnet.mappers.AccountMapper;
 import socnet.services.interfaces.AccountService;
+import socnet.services.interfaces.UserService;
 import socnet.util.TestUtil;
 
 import static org.mockito.Mockito.when;
@@ -35,12 +36,15 @@ public class AccountRestControllerTest {
     @Mock
     AccountMapper accountMapperMock;
     
+    @Mock
+    UserService userServiceMock;
+    
     private AccountDto accountDto;
     private Account account;
     
     @Before
     public void setUp() {
-        controller = new AccountRestController(accountServiceMock, accountMapperMock);
+        controller = new AccountRestController(accountServiceMock, accountMapperMock, userServiceMock);
         
         stringHttpMessageConverter = TestUtil.stringHttpMessageConverter();
         jackson2HttpMessageConverter = TestUtil.jackson2HttpMessageConverter();

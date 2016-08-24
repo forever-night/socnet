@@ -14,6 +14,7 @@
                 <c:if test="${param.error != null}">{{loginError()}}</c:if>
                 <c:if test="${param.logout != null}">{{logoutSuccessful()}}</c:if>
                 <c:if test="${param.signup != null}">{{signupSuccessful()}}</c:if>
+                <c:if test="${param.delete != null}">{{deleteSuccessful()}}</c:if>
                 <h2 style="margin-bottom: 15px;">Log in</h2>
                 <div class="form-group" ng-click="hideStatus()">
                     <label for="username" class="sr-only">Login</label>

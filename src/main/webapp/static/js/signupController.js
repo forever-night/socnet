@@ -14,6 +14,8 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
             }
         };
 
+        console.log(csrfToken);
+
         var request = $http.post(restUrl.account, data, config).then(
             function success(response) {
                 $window.location.href = url.login + "?signup";
@@ -40,8 +42,6 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
             StatusService.setStatus(status, false, 'Unacceptable e-mail format');
             return;
         }
-
-        // TODO check if login is taken
 
 
         var validatePassword = ValidateService.validateConfirmPassword($scope.account.password, $scope.confirmPassword);

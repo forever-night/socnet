@@ -44,7 +44,7 @@
                             </div>
                             <div class="form-group input-group-sm">
                                 <label for="inputCity">City</label>
-                                <input id="inputCity" type="text" class="form-control" ng-model="profile.currentCity"/>
+                                <input id="inputCity" type="text" class="form-control" ng-model="profile.city"/>
                             </div>
                             <div class="form-group input-group-sm">
                                 <label for="inputPhone">Phone</label>

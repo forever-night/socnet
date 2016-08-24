@@ -1,8 +1,5 @@
 package socnet.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -11,7 +8,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "account")
-//@JsonIgnoreProperties(value = {"version"}, ignoreUnknown = true)
 public class Account implements Serializable{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
@@ -23,7 +19,6 @@ public class Account implements Serializable{
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name="created_at")

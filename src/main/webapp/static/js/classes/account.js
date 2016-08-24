@@ -1,23 +1,21 @@
 function Account() {
-    this.id = 0;
     this.login = '';
     this.email = '';
     this.password = '';
 }
 
-function Account(id, email) {
-    this.id = id;
+function Account(email) {
     this.login = '';
     this.email = email;
     this.password = '';
 }
 
-function Account(id, login, email) {
-    this.id = id;
+function Account(login, email) {
     this.login = login;
     this.email = email;
+    this.password = '';
 }
 
 function copy(account) {
-    return new Account(account.id, account.login, account.email);
+    return new Account(account.login, account.email);
 }

@@ -38,12 +38,11 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
                 if (data != null)
                     $scope.profile = new Profile(
-                        data.id,
                         data.name,
                         data.dateOfBirth,
                         data.phone,
                         data.country,
-                        data.currentCity,
+                        data.city,
                         data.info
                     );
             },
@@ -61,7 +60,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
             }
         };
 
-        return $http.put(restUrl.profile + "/" + $scope.profile.id, data, config);
+        return $http.put(restUrl.profile + "/" + $scope.account.login, data, config);
     };
 
     $scope.getAccount = function () {
@@ -71,7 +70,6 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
                 if (data != null)
                     $scope.account = new Account(
-                        data.id,
                         data.login,
                         data.email);
 
@@ -133,7 +131,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
             }
         };
 
-        $http.delete(restUrl.account + "/" + $scope.account.id + "?login=" + login, config).then(
+        return $http.delete(restUrl.account + "/" + $scope.account.login, config).then(
             function success(response) {
                 if (response.status == 200)
                     deleteStatus = 1;
@@ -233,7 +231,6 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
             return;
         }
 
-
         $scope.putAccountEmail($scope.newAccount).then(
             function () {
                 if (emailUpdateStatus != null && emailUpdateStatus > 0) {
@@ -277,6 +274,8 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                     StatusService.setStatus(statusElement.password, true, 'Success!');
 
                 passwordUpdateStatus = null;
+
+            //    TODO clear form
             },
             function() {
                 StatusService.setStatus(statusElement.password, false, 'Error in updating password!');
@@ -294,10 +293,18 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         if (confirm) {
             $scope.removeAccount().then(
                 function() {
-                    if (deleteStatus != null && deleteStatus > 0)
-                        $http.post(url.logout, "", config);
+                    var config = {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN' : csrfToken
+                        }
+                    };
 
                     deleteStatus = null;
+                    $http.post(url.logout, "", config).then(
+                        function() {
+                            $window.location.href = url.login + "?delete";
+                        });
                 },
                 function() {
                     StatusService.setStatus(statusElement.delete, false, 'Account not found!');
@@ -324,4 +331,5 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
 
     $scope.setProfileSelected(true);
+    $scope.getAccount();
 });

@@ -10,12 +10,11 @@ app.controller('ProfileCtrl', function($scope, $http, $window) {
 
                 if (data != null)
                     $scope.profile = new Profile(
-                        data.id,
                         data.name,
                         data.dateOfBirth,
                         data.phone,
                         data.country,
-                        data.currentCity,
+                        data.city,
                         data.info
                     );
                 else
