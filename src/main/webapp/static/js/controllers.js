@@ -1,22 +1,42 @@
 app = angular.module('app', []);
 
 url = {
-    login: '/socnet/login',
-    profile: '/socnet/profile',
-    settings: '/socnet/settings',
-    error: '/socnet/error',
-    logout: '/socnet/logout',
-    accessDenied: '/socnet/403'
+    login: context + '/login',
+    profile: context + '/profile',
+    settings: context + '/settings',
+    error: context + '/error',
+    logout: context + '/logout',
+    accessDenied: context + '/403'
 };
 
 restUrl = {
-    profile: '/socnet/api/profile',
-    account: '/socnet/api/account'
+    profile: context + '/api/profile',
+    account: context + '/api/account'
 };
 
 configJson = {
     headers: {
         'Content-Type': 'application/json'
+    }
+};
+
+message = {
+    success: {
+        success: 'Success!',
+        logout: 'Logout successful!',
+        accountCreated: 'Account created successfully!',
+        accountDeleted: 'Account deleted successfully!'
+    },
+    error: {
+        invalidCredentials: 'Invalid login or password',
+        signup: 'Unable to sign up',
+        fieldEmpty: 'One of the fields is empty',
+        emailFormat: 'Unacceptable e-mail format',
+        passwordMatch: 'Passwords should match',
+        emailNotModified: 'e-mail is not modified',
+        profileNotFound: 'Profile not found',
+        accountNotFound: 'Account not found',
+        internalError: 'Internal server error'
     }
 };
 

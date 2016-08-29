@@ -3,19 +3,19 @@ app.controller('LoginCtrl', function($scope, StatusService) {
 
 
     $scope.logoutSuccessful = function() {
-        StatusService.setStatus(status, true, "Logout successful!");
+        StatusService.setStatus(status, true, message.success.logout);
     };
 
     $scope.signupSuccessful = function() {
-        StatusService.setStatus(status, true, "Account created successfully!");
+        StatusService.setStatus(status, true, message.success.accountCreated);
     };
 
     $scope.deleteSuccessful = function() {
-        StatusService.setStatus(status, true, "Account deleted successfully!");
-    }
+        StatusService.setStatus(status, true, message.success.accountDeleted);
+    };
 
     $scope.loginError = function() {
-        StatusService.setStatus(status, false, "Invalid login or password.");
+        StatusService.setStatus(status, false, message.error.invalidCredentials);
     };
 
     $scope.hideStatus = function() {

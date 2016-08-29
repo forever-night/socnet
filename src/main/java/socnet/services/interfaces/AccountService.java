@@ -2,8 +2,6 @@ package socnet.services.interfaces;
 
 import socnet.entities.Account;
 
-import java.io.IOException;
-
 
 public interface AccountService {
     Account find(int id);
@@ -26,8 +24,4 @@ public interface AccountService {
     int remove(Account account);
 
     String encodePassword(String password);
-
-    boolean passwordMatches(Account account);
-
-    Account fromJson(String json) throws IOException;
 }

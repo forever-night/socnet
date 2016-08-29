@@ -1,5 +1,6 @@
 package socnet.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -27,10 +28,12 @@ public class AccountDto implements Serializable {
         this.email = email;
     }
     
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
     
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }

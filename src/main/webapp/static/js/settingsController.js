@@ -34,20 +34,24 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
     $scope.getProfile = function () {
         return $http.get(restUrl.profile + "/" + login).then(
             function (response) {
-                var data = response.data;
+                if (response.status == 204)
+                    $window.location.href = url.error + '?errorMessage=' + message.error.profileNotFound;
+                else {
+                    var data = response.data;
 
-                if (data != null)
-                    $scope.profile = new Profile(
-                        data.name,
-                        data.dateOfBirth,
-                        data.phone,
-                        data.country,
-                        data.city,
-                        data.info
-                    );
+                    if (data != null)
+                        $scope.profile = new Profile(
+                            data.name,
+                            data.dateOfBirth,
+                            data.phone,
+                            data.country,
+                            data.city,
+                            data.info
+                        );
+                }
             },
-            function () {
-                $window.location.href = url.error;
+            function (response) {
+                $window.location.href = url.error + '?errorMessage=Error ' + response.status;
             }
         );
     };
@@ -66,14 +70,21 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
     $scope.getAccount = function () {
         return $http.get(restUrl.account + "/" + login).then(
             function (response) {
-                var data = response.data;
+                if (response.status == 204)
+                    $window.location.href = url.error + '?errorMessage=' + message.error.accountNotFound;
+                else {
+                    var data = response.data;
 
-                if (data != null)
-                    $scope.account = new Account(
-                        data.login,
-                        data.email);
+                    if (data != null)
+                        $scope.account = new Account(
+                            data.login,
+                            data.email);
 
-                $scope.newAccount = copy($scope.account);
+                    $scope.newAccount = copy($scope.account);
+                }
+            },
+            function error(response) {
+                $window.location.href = url.error + '?errorMessage=Error ' + response.status;
             }
         );
     };
@@ -93,9 +104,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                     emailUpdateStatus = 1;
             },
             function error(response) {
-                if (response.status == 403)
-                    $window.location.href = url.accessDenied;
-                else
+                if (response.status != 403)
                     emailUpdateStatus = -1;
             }
         );
@@ -115,9 +124,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                     passwordUpdateStatus = 1;
             },
             function error(response) {
-                if (response.status == 403)
-                    $window.location.href = url.accessDenied;
-                else
+                if (response.status != 403)
                     passwordUpdateStatus = -1;
             }
         );
@@ -137,9 +144,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                     deleteStatus = 1;
             },
             function error(response) {
-                if (response.status == 403)
-                    $window.location.href = url.accessDenied;
-                else
+                if (response.status != 403)
                     deleteStatus = -1;
             }
         );
@@ -195,11 +200,11 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
         $scope.putProfile($scope.profile).then(
             function () {
-                StatusService.setStatus(statusElement.profile, true, 'Success!');
+                StatusService.setStatus(statusElement.profile, true, message.success.success);
                 persistentProfile = copyTo($scope.profile, persistentProfile);
             },
             function () {
-                StatusService.setStatus(statusElement.profile, false, 'Error! Try again later');
+                StatusService.setStatus(statusElement.profile, false, message.error.internalError);
             }
         );
     };
@@ -213,7 +218,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
             return;
 
         if ($scope.newAccount.email == null) {
-            StatusService.setStatus(statusElement.email, false, 'Field is empty');
+            StatusService.setStatus(statusElement.email, false, message.error.fieldEmpty);
             return;
         }
 
@@ -221,27 +226,27 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         var validated = ValidateService.validateEmail($scope.newAccount.email);
 
         if (!validated) {
-            StatusService.setStatus(statusElement.email, false, 'Unacceptable e-mail format');
+            StatusService.setStatus(statusElement.email, false, message.error.emailFormat);
             return;
         }
 
 
         if ($scope.newAccount.email == $scope.account.email) {
-            StatusService.setStatus(statusElement.email, true, 'E-mail is the same.');
+            StatusService.setStatus(statusElement.email, true, message.error.emailNotModified);
             return;
         }
 
         $scope.putAccountEmail($scope.newAccount).then(
             function () {
                 if (emailUpdateStatus != null && emailUpdateStatus > 0) {
-                    StatusService.setStatus(statusElement.email, true, 'Success!');
+                    StatusService.setStatus(statusElement.email, true, message.success.success);
                     $scope.account.email = $scope.newAccount.email;
                 }
 
                 emailUpdateStatus = null;
             },
             function () {
-                StatusService.setStatus(statusElement.email, false, 'Error in updating e-mail');
+                StatusService.setStatus(statusElement.email, false, message.error.internalError);
 
                 emailUpdateStatus = null;
             });
@@ -271,14 +276,14 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         $scope.putAccountPassword(newAccount).then(
             function () {
                 if (passwordUpdateStatus != null && passwordUpdateStatus > 0)
-                    StatusService.setStatus(statusElement.password, true, 'Success!');
+                    StatusService.setStatus(statusElement.password, true, message.success.success);
 
                 passwordUpdateStatus = null;
 
             //    TODO clear form
             },
             function() {
-                StatusService.setStatus(statusElement.password, false, 'Error in updating password!');
+                StatusService.setStatus(statusElement.password, false, message.error.internalError);
                 passwordUpdateStatus = null;
             });
     };
@@ -307,7 +312,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
                         });
                 },
                 function() {
-                    StatusService.setStatus(statusElement.delete, false, 'Account not found!');
+                    StatusService.setStatus(statusElement.delete, false, message.error.accountNotFound);
                     deleteStatus = null;
                 });
         }
@@ -315,7 +320,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
     $scope.validatePassword = function (oldPassword, newPassword, confirmPassword) {
         if (oldPassword == '' || newPassword == '' || confirmPassword == '') {
-            StatusService.setStatus(statusElement.password, false, 'One of the fields is empty');
+            StatusService.setStatus(statusElement.password, false, message.error.fieldEmpty);
             return false;
         }
 
@@ -324,7 +329,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         if (validateConfirmPassword)
             return true;
         else {
-            StatusService.setStatus(statusElement.password, false, 'Passwords should match');
+            StatusService.setStatus(statusElement.password, false, message.error.passwordMatch);
             return false;
         }
     };

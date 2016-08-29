@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.util.NestedServletException;
 import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 import socnet.util.TestUtil;
@@ -49,13 +50,13 @@ public class ProfileControllerTest {
                 .andExpect(model().attribute("login", expectedUsername));
     }
 
-    @Test
-    public void return403ViewNotLoggedIn() throws Exception {
+    @Test(expected = NestedServletException.class)
+    public void returnAccessDeniedForProfile() throws Exception {
         when(mockUserService.getCurrentLogin())
                 .thenReturn(null);
         
         mockMvc.perform(get("/profile"))
-                .andExpect(view().name("403"));
+                .andReturn();
     }
     
     @Test
@@ -72,14 +73,14 @@ public class ProfileControllerTest {
                 .andExpect(model().attribute("login", expectedLogin));
     }
     
-    @Test
-    public void return403ForProfileViewForLogin() throws Exception {
+    @Test(expected = NestedServletException.class)
+    public void returnAccessDeniedForProfileLogin() throws Exception {
         String expectedLogin = "bbb";
         
         when(mockUserService.getCurrentLogin())
                 .thenReturn(null);
         
         mockMvc.perform(get("/profile/" + expectedLogin))
-                .andExpect(view().name("403"));
+                .andReturn();
     }
 }

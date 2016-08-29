@@ -3,12 +3,15 @@ package socnet.controllers.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
+import socnet.controllers.EmptyRequestException;
 import socnet.dto.AccountDto;
 import socnet.entities.Account;
 import socnet.mappers.AccountMapper;
 import socnet.services.interfaces.AccountService;
 import socnet.services.interfaces.UserService;
+import socnet.util.Global;
 
 
 @RestController
@@ -25,7 +28,6 @@ public class AccountRestController {
     
     public AccountRestController() {}
     
-//    for tests
     public AccountRestController(AccountService accountService, AccountMapper accountMapper, UserService userService) {
         this.accountService = accountService;
         this.accountMapper = accountMapper;
@@ -34,20 +36,16 @@ public class AccountRestController {
     
     
     @RequestMapping(path = "/{login}", method = RequestMethod.GET)
-    public Account getAccountByLogin(@PathVariable String login) {
-        if (login != null && !login.isEmpty())
-            return accountService.findByLogin(login);
-        else
-            return null;
+    public AccountDto getAccountByLogin(@PathVariable String login) {
+        return accountMapper.asAccountDto(accountService.findByLogin(login));
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity signUp(@RequestBody AccountDto accountDto) {
-        if (accountDto == null)
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        else if (accountDto.getLogin() == null || accountDto.getLogin().isEmpty() ||
+    public ResponseEntity signUp(@RequestBody AccountDto accountDto) throws EmptyRequestException {
+        if (accountDto == null ||
+                accountDto.getLogin() == null || accountDto.getLogin().isEmpty() ||
                 accountDto.getPassword() == null || accountDto.getPassword().isEmpty())
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmptyRequestException();
         
         
         Account account = accountMapper.asAccount(accountDto);
@@ -59,11 +57,12 @@ public class AccountRestController {
     }
 
     @RequestMapping(path = "/{login}/email", method = RequestMethod.PUT)
-    public ResponseEntity updateEmail(@RequestBody AccountDto accountDto, @PathVariable String login) {
+    public ResponseEntity updateEmail(@RequestBody AccountDto accountDto, @PathVariable String login)
+            throws EmptyRequestException {
         if (accountDto == null || login == null)
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            throw new EmptyRequestException();
         else if (!login.equals(accountDto.getLogin()))
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
         
         Account account = accountMapper.asAccount(accountDto);
@@ -73,11 +72,12 @@ public class AccountRestController {
     }
     
     @RequestMapping(path = "/{login}/password", method = RequestMethod.PUT)
-    public ResponseEntity updatePassword(@RequestBody AccountDto accountDto, @PathVariable String login) {
+    public ResponseEntity updatePassword(@RequestBody AccountDto accountDto, @PathVariable String login)
+            throws EmptyRequestException {
         if (accountDto == null || login == null)
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            throw new EmptyRequestException();
         else if (!login.equals(accountDto.getLogin()))
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
         
         Account account = accountMapper.asAccount(accountDto);
@@ -87,19 +87,20 @@ public class AccountRestController {
     }
 
     @RequestMapping(path = "/{login}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable String login) {
+    public ResponseEntity delete(@PathVariable String login) throws EmptyRequestException {
         if (login == null || login.isEmpty())
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        else {
-            String currentLogin = userService.getCurrentLogin();
-            
-            if (!login.equals(currentLogin))
-                return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-            
-            Account account = accountService.findByLogin(login);
-            accountService.remove(account);
-            
-            return new ResponseEntity(HttpStatus.OK);
-        }
+            throw new EmptyRequestException();
+        
+        
+        String currentLogin = userService.getCurrentLogin();
+        
+        if (!login.equals(currentLogin))
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
+        
+        
+        Account account = accountService.findByLogin(login);
+        accountService.remove(account);
+        
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

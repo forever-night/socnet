@@ -42,6 +42,15 @@ public class TestUtil {
         return account;
     }
     
+    public static Account generateAccount(String login) {
+        Account account = new Account();
+        account.setLogin(login);
+        account.setPassword(login);
+        account.setEmail(login + "@" + login + "." + login);
+        
+        return account;
+    }
+    
     public static AccountDto generateAccountDto() {
         AccountDto accountDto = new AccountDto();
         
@@ -58,6 +67,15 @@ public class TestUtil {
         profile.setName("test");
         profile.setCountry("test");
         profile.setPhone("007");
+        
+        return profile;
+    }
+    
+    public static Profile generateProfile(Account account) {
+        Profile profile = new Profile();
+        profile.setId(account.getId());
+        profile.setName(account.getLogin());
+        profile.setPhone("1234");
         
         return profile;
     }

@@ -1,6 +1,5 @@
 package socnet.dao.impl;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,11 @@ import socnet.dao.interfaces.AccountDao;
 import socnet.entities.Account;
 import socnet.entities.Role;
 
+import javax.persistence.NoResultException;
+
+import static org.junit.Assert.*;
+import static socnet.util.TestUtil.generateAccount;
+
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
@@ -24,86 +28,83 @@ public class AccountDaoImplTest {
         
     @Test
     public void persistNotNull() {
-        Account account = createAccount("aaa");
+        Account account = generateAccount("aaa");
         
         Integer actualId = accountDao.persist(account);
         
-        Assert.assertNotNull(actualId);
-        Assert.assertTrue(actualId > 0);
-        Assert.assertTrue(account.getEnabled());
-        Assert.assertEquals(Role.USER, account.getRole());
+        assertNotNull(actualId);
+        assertTrue(actualId > 0);
+        assertTrue(account.getEnabled());
+        assertEquals(Role.USER, account.getRole());
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void persistNull() {
         Integer actualId = accountDao.persist(null);
         
-        Assert.assertNull(actualId);
+        assertNull(actualId);
     }
     
     @Test
     public void findIfExists() {
-        Account expected = createAccount("testtest");
+        Account expected = generateAccount("testtest");
         accountDao.persist(expected);
         
         Account actual = accountDao.find(expected.getId());
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
     
     @Test
     public void findIfNotExists() {
         Account actual = accountDao.find(100500);
-        Assert.assertNull(actual);
+        assertNull(actual);
     }
     
     @Test
     public void findByLoginIfExists() {
         String expectedLogin = "testtest";
-        Account expected = createAccount(expectedLogin);
+        Account expected = generateAccount(expectedLogin);
         accountDao.persist(expected);
         
         Account actual = accountDao.findByLogin(expectedLogin);
         
-        Assert.assertNotNull(actual);
-        Assert.assertEquals(expected, actual);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
     }
     
-    @Test
+    @Test(expected = NoResultException.class)
     public void findByLoginIfNotExists() {
         Account actual = accountDao.findByLogin("testtest");
-        Assert.assertNull(actual);
     }
     
     @Test
-    public void update() {
-        Account expected = createAccount("testtest");
+    public void updateIfExists() {
+        Account expected = generateAccount("testtest");
         accountDao.persist(expected);
         
         expected.setPassword("asdf1");
         accountDao.update(expected);
         
         Account actual = accountDao.find(expected.getId());
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
+    }
+    
+    @Test(expected = NoResultException.class)
+    public void updateIfNotExists() {
+        Account expected = generateAccount();
+        
+        accountDao.update(expected);
     }
     
     @Test
     public void remove() {
-        Account expected = createAccount("testtest");
+        Account expected = generateAccount("testtest");
         accountDao.persist(expected);
         
         Account actual = accountDao.find(expected.getId());
         
         accountDao.remove(expected);
         actual = accountDao.find(actual.getId());
-        Assert.assertNull(actual);
-    }
-    
-    private Account createAccount(String login) {
-        Account account = new Account();
-        account.setLogin(login);
-        account.setPassword(login);
-        account.setEmail(login + "@" + login + "." + login);
-        
-        return account;
+        assertNull(actual);
     }
 }

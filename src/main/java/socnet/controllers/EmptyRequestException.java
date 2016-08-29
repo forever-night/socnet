@@ -1,4 +1,4 @@
 package socnet.controllers;
 
-public class EmptyFieldException extends Exception {
+public class EmptyRequestException extends Exception {
 }

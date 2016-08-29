@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import socnet.util.Global;
 import socnet.util.TestUtil;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,7 +33,7 @@ public class ErrorControllerTest {
         mockMvc.perform(get("/error"))
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", ErrorController.DEFAULT_MSG));
+                .andExpect(model().attribute("errorMessage", Global.Error.UNEXPECTED.getMessage()));
     }
     
     @Test
@@ -42,7 +43,7 @@ public class ErrorControllerTest {
         mockMvc.perform(get("/error").param("errorMessage", errorMessage))
                 .andExpect(view().name("error"))
                 .andExpect(model().attributeExists("errorMessage"))
-                .andExpect(model().attribute("errorMessage", ErrorController.DEFAULT_MSG));
+                .andExpect(model().attribute("errorMessage", Global.Error.UNEXPECTED.getMessage()));
     }
     
     @Test

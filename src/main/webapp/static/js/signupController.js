@@ -16,12 +16,15 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
 
         console.log(csrfToken);
 
-        var request = $http.post(restUrl.account, data, config).then(
-            function success(response) {
+        return $http.post(restUrl.account, data, config).then(
+            function success() {
                 $window.location.href = url.login + "?signup";
             },
             function error(response) {
-                StatusService.setStatus(status, false, 'Unable to sign up');
+                if (response.status == 400)
+                    StatusService.setStatus(status, false, message.error.fieldEmpty);
+                else
+                    StatusService.setStatus(status, false, message.error.signup);
             }
         );
     };
@@ -31,7 +34,7 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
 
 
         if ($scope.account.login == '' || $scope.account.email == '' || $scope.account.password == '') {
-            StatusService.setStatus(status, false, 'One of the fields is empty');
+            StatusService.setStatus(status, false, message.error.fieldEmpty);
             return;
         }
 
@@ -39,7 +42,7 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
         var validateEmail = ValidateService.validateEmail($scope.account.email);
 
         if (!validateEmail) {
-            StatusService.setStatus(status, false, 'Unacceptable e-mail format');
+            StatusService.setStatus(status, false, message.error.emailFormat);
             return;
         }
 
@@ -47,9 +50,9 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
         var validatePassword = ValidateService.validateConfirmPassword($scope.account.password, $scope.confirmPassword);
 
         if (validatePassword) {
-            $scope.postAccount($scope.account);
+            return $scope.postAccount($scope.account);
         } else {
-            StatusService.setStatus(status, false, 'Passwords should match');
+            StatusService.setStatus(status, false, message.error.passwordMatch);
             return false;
         }
     };

@@ -1,6 +1,5 @@
 package socnet.dao.impl;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,12 @@ import socnet.dao.interfaces.AccountDao;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Account;
 import socnet.entities.Profile;
+
+import javax.persistence.NoResultException;
+
+import static org.junit.Assert.*;
+import static socnet.util.TestUtil.generateAccount;
+import static socnet.util.TestUtil.generateProfile;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -28,14 +33,14 @@ public class ProfileDaoImplTest {
     
     @Test
     public void persistNotNull() {
-        Account account = createAccount("testtest");
+        Account account = generateAccount("testtest");
         accountDao.persist(account);
         
-        Profile profile = createProfile(account);
+        Profile profile = generateProfile(account);
         Integer actualId = profileDao.persist(profile);
         
-        Assert.assertNotNull(actualId);
-        Assert.assertTrue(actualId > 0);
+        assertNotNull(actualId);
+        assertTrue(actualId > 0);
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -45,49 +50,48 @@ public class ProfileDaoImplTest {
     
     @Test
     public void findIfExists() {
-        Account account = createAccount("testtest");
+        Account account = generateAccount("testtest");
         accountDao.persist(account);
         
-        Profile expected = createProfile(account);
+        Profile expected = generateProfile(account);
         profileDao.persist(expected);
         
         Profile actual = profileDao.find(expected.getId());
         
-        Assert.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
     
     @Test
     public void findIfNotExists() {
         Profile actual = profileDao.find(100500);
-        Assert.assertNull(actual);
+        assertNull(actual);
     }
     
     @Test
     public void findByLoginIfExists() {
         String expectedLogin = "testtest";
         
-        Account expectedAccount = createAccount(expectedLogin);
+        Account expectedAccount = generateAccount(expectedLogin);
         accountDao.persist(expectedAccount);
         
-        Profile expectedProfile = createProfile(expectedAccount);
+        Profile expectedProfile = generateProfile(expectedAccount);
         profileDao.persist(expectedProfile);
         
         Profile actualProfile = profileDao.findByLogin(expectedLogin);
-        Assert.assertEquals(expectedProfile, actualProfile);
+        assertEquals(expectedProfile, actualProfile);
     }
     
-    @Test
+    @Test(expected = NoResultException.class)
     public void findByLoginIfNotExists() {
         Profile actual = profileDao.findByLogin("testtest");
-        Assert.assertNull(actual);
     }
     
     @Test
-    public void update() {
-        Account account = createAccount("testtest");
+    public void updateIfExists() {
+        Account account = generateAccount("testtest");
         accountDao.persist(account);
         
-        Profile expectedProfile = createProfile(account);
+        Profile expectedProfile = generateProfile(account);
         profileDao.persist(expectedProfile);
         
         expectedProfile.setName("blablabla");
@@ -95,16 +99,23 @@ public class ProfileDaoImplTest {
         profileDao.update(expectedProfile);
         
         Profile actualProfile = profileDao.find(expectedProfile.getId());
-        Assert.assertEquals(expectedProfile, actualProfile);
+        assertEquals(expectedProfile, actualProfile);
     }
     
+    @Test(expected = NoResultException.class)
+    public void updateIfNotExists() {
+        Account account = generateAccount();
+        Profile profile = generateProfile(account);
+        
+        profileDao.update(profile, account.getLogin());
+    }
     
     @Test
     public void remove() {
-        Account account = createAccount("testtest");
+        Account account = generateAccount("testtest");
         accountDao.persist(account);
         
-        Profile expected = createProfile(account);
+        Profile expected = generateProfile(account);
         profileDao.persist(expected);
         
         Profile actual = profileDao.find(expected.getId());
@@ -112,24 +123,6 @@ public class ProfileDaoImplTest {
         profileDao.remove(expected.getId());
         actual = profileDao.find(actual.getId());
         
-        Assert.assertNull(actual);
-    }
-    
-    private Profile createProfile(Account account) {
-        Profile profile = new Profile();
-        profile.setId(account.getId());
-        profile.setName(account.getLogin());
-        profile.setPhone("1234");
-        
-        return profile;
-    }
-    
-    private Account createAccount(String login) {
-        Account account = new Account();
-        account.setLogin(login);
-        account.setPassword(login);
-        account.setEmail(login + "@" + login + "." + login);
-        
-        return account;
+        assertNull(actual);
     }
 }

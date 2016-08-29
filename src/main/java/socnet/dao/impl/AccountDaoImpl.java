@@ -1,14 +1,11 @@
 package socnet.dao.impl;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import socnet.dao.interfaces.AccountDao;
 import socnet.entities.Account;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
@@ -16,8 +13,6 @@ import java.util.List;
 
 @Component
 public class AccountDaoImpl implements AccountDao{
-    private static final Logger LOGGER = LogManager.getLogger(AccountDaoImpl.class);
-
     @PersistenceContext
     private EntityManager em;
 
@@ -28,34 +23,18 @@ public class AccountDaoImpl implements AccountDao{
 
     @Override
     public Account findByLogin(String login) {
-        Account acc = null;
-
         Query query = em.createQuery("from Account where login = :login");
         query.setParameter("login", login);
 
-        try {
-            acc = (Account) query.getSingleResult();
-        } catch (NoResultException e) {
-            LOGGER.info("user " + login + " not found");
-        } finally {
-            return acc;
-        }
+        return (Account) query.getSingleResult();
     }
 
     @Override
     public Account findByEmail(String email) {
-        Account acc = null;
-
         Query query = em.createQuery("from Account where email = :email");
         query.setParameter("email", email);
 
-        try {
-            acc = (Account) query.getSingleResult();
-        } catch (NoResultException e) {
-            LOGGER.info("user " + email + " not found");
-        } finally {
-            return acc;
-        }
+        return (Account) query.getSingleResult();
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.util.NestedServletException;
 import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 import socnet.util.TestUtil;
@@ -49,13 +50,13 @@ public class SettingsControllerTest {
                 .andExpect(model().attributeExists("login"))
                 .andExpect(model().attribute("login", expectedLogin));
     }
-
-    @Test
-    public void return403View() throws Exception {
+    
+    @Test(expected = NestedServletException.class)
+    public void returnAccessDenied() throws Exception {
         when(mockUserService.getCurrentLogin())
                 .thenReturn(null);
 
         mockMvc.perform(get("/settings"))
-                .andExpect(view().name("403"));
+                .andReturn();
     }
 }
