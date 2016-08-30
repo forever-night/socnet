@@ -21,6 +21,7 @@
         <java.servlet.version>3.1.0</java.servlet.version>
         <java.jstl.version>1.2</java.jstl.version>
         <junit.version>4.12</junit.version>
+        <h2.version>1.4.192</h2.version>
         <mockito.version>2.0.62-beta</mockito.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
     </properties>
@@ -141,6 +142,14 @@
             <artifactId>jstl</artifactId>
             <version>${java.jstl.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>junit</groupId>
