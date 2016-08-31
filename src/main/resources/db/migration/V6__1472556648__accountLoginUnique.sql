@@ -1,0 +1,1 @@
+create unique index on account (lower(login));
