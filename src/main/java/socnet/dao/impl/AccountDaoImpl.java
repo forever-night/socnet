@@ -44,6 +44,10 @@ public class AccountDaoImpl implements AccountDao{
 
     @Override
     public Integer persist(Account account) {
+        if (account == null)
+            throw new IllegalArgumentException();
+        
+        account.setLogin(account.getLogin().toLowerCase());
         em.persist(account);
         em.flush();
 

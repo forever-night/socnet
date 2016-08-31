@@ -168,13 +168,12 @@ public class Profile implements Serializable {
         return Objects.equals(name, profile.name) &&
                 Objects.equals(country, profile.country) &&
                 Objects.equals(phone, profile.phone) &&
-                Objects.equals(info, profile.info) &&
                 Objects.equals(currentCity, profile.currentCity) &&
                 Objects.equals(dateOfBirth, profile.dateOfBirth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, country, phone, info, currentCity, dateOfBirth);
+        return Objects.hash(name, country, phone, currentCity, dateOfBirth);
     }
 }

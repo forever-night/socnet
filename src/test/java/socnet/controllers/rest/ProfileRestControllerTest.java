@@ -16,11 +16,17 @@ import socnet.entities.Profile;
 import socnet.mappers.ProfileMapper;
 import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
-import socnet.util.TestUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static socnet.util.TestUtil.*;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,21 +51,54 @@ public class ProfileRestControllerTest {
     @Before
     public void setUp() {
         controller = new ProfileRestController(profileServiceMock, profileMapperMock, userService);
-        stringHttpMessageConverter = TestUtil.stringHttpMessageConverter();
-        jackson2HttpMessageConverter = TestUtil.jackson2HttpMessageConverter();
+        stringHttpMessageConverter = stringHttpMessageConverter();
+        jackson2HttpMessageConverter = jackson2HttpMessageConverter();
         
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setMessageConverters(stringHttpMessageConverter, jackson2HttpMessageConverter)
                 .build();
         
         
-        profileDto = TestUtil.generateProfileDto();
-        profile = TestUtil.generateProfile();
+        profileDto = generateProfileDto();
+        profile = generateProfile();
+    }
+    
+    @Test
+    public void getProfilesLikeLoginNotNull() throws Exception {
+        String searchPattern = "test";
+        Map<String, Profile> profileMap = new HashMap<>();
+
+        Profile tempProfile;
+        
+        for (int i = 0; i < 2; i++) {
+            tempProfile = generateProfile();
+            profileMap.put(i + searchPattern + i, tempProfile);
+        }
+        
+
+        when(profileServiceMock.findAllLikeLogin(searchPattern))
+                .thenReturn(profileMap);
+
+        when(profileMapperMock.asProfileDto(any()))
+                .thenReturn(generateProfileDto());
+
+
+        mockMvc.perform(get("/api/profile")
+                .param("search", searchPattern))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+    }
+    
+    @Test(expected = NestedServletException.class)
+    public void getProfilesLikeLoginNull() throws Exception {
+        mockMvc.perform(get("/api/profile")
+                .param("search", ""))
+                .andReturn();
     }
     
     @Test
     public void updateNotNull() throws Exception {
-        String json = TestUtil.toJson(profileDto, TestUtil.jackson2HttpMessageConverter());
+        String json = toJson(profileDto, jackson2HttpMessageConverter());
         
         when(profileMapperMock.asProfile(profileDto))
                 .thenReturn(profile);
@@ -79,7 +118,7 @@ public class ProfileRestControllerTest {
     
     @Test(expected = NestedServletException.class)
     public void updateDifferentLoginOwner() throws Exception {
-        String json = TestUtil.toJson(profileDto, TestUtil.jackson2HttpMessageConverter());
+        String json = toJson(profileDto, jackson2HttpMessageConverter());
     
         when(userService.getCurrentLogin())
                 .thenReturn("aaa");

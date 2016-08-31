@@ -22,13 +22,23 @@
         <div class="navbar-header">
             <a class="navbar-brand" href="<c:url value='/'/>">SocNet</a>
         </div>
-
         <div>
             <ul class="nav navbar-nav">
                 <li class="active"><a href="<c:url value='/'/>">Home</a></li>
                 <li><a href="${pageContext.request.contextPath}/profile">Profile</a></li>
                 <li><a href="${pageContext.request.contextPath}/settings">Settings</a></li>
             </ul>
+            <form class="navbar-form navbar-left">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" ng-model="searchQuery">
+                    <span class="input-group-btn">
+                        <a href="${pageContext.request.contextPath}/search?query={{searchQuery}}"
+                           class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </a>
+                    </span>
+                </div>
+            </form>
             <form action="${pageContext.request.contextPath}/logout" method="post"
                   class="navbar-form navbar-right">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

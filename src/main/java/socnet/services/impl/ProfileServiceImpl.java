@@ -7,6 +7,7 @@ import socnet.entities.Profile;
 import socnet.services.interfaces.ProfileService;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -28,7 +29,12 @@ public class ProfileServiceImpl implements ProfileService {
     public List<Profile> findAll() {
         return profileDao.findAll();
     }
-
+    
+    @Override
+    public Map<String, Profile> findAllLikeLogin(String login) {
+        return profileDao.findAllLikeLogin(login);
+    }
+    
     @Override
     public Profile create(int accountId) {
         Profile profile = new Profile();

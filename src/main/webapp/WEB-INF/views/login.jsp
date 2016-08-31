@@ -10,7 +10,7 @@
     </jsp:attribute>
     <jsp:body>
         <div ng-controller="LoginCtrl">
-            <form class="col-md-offset-4 col-md-4 form-horizontal" method="post" action="<c:url value="/login"/>">
+            <form class="col-sm-offset-4 col-sm-4 form-horizontal" method="post" action="<c:url value="/login"/>">
                 <c:if test="${param.error != null}">{{loginError()}}</c:if>
                 <c:if test="${param.logout != null}">{{logoutSuccessful()}}</c:if>
                 <c:if test="${param.signup != null}">{{signupSuccessful()}}</c:if>

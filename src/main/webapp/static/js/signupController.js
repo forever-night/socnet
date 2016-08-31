@@ -14,17 +14,21 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
             }
         };
 
-        console.log(csrfToken);
-
         return $http.post(restUrl.account, data, config).then(
             function success() {
                 $window.location.href = url.login + "?signup";
             },
             function error(response) {
-                if (response.status == 400)
-                    StatusService.setStatus(status, false, message.error.fieldEmpty);
-                else
-                    StatusService.setStatus(status, false, message.error.signup);
+                switch (response.status) {
+                    case 400:
+                        StatusService.setStatus(status, false, message.error.fieldEmpty);
+                        break;
+                    case 422:
+                        StatusService.setStatus(status, false, message.error.loginTaken);
+                        break;
+                    default:
+                        StatusService.setStatus(status, false, message.error.signup);
+                }
             }
         );
     };

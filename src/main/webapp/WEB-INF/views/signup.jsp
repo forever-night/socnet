@@ -12,7 +12,7 @@
     </jsp:attribute>
     <jsp:body>
         <div ng-controller="SignupCtrl">
-            <form class="col-md-offset-4 col-md-4 form-horizontal" method="post">
+            <form class="col-sm-offset-4 col-sm-4 form-horizontal" method="post">
                 <h2 style="margin-bottom: 15px;">Sign up</h2>
                 <div class="form-group">
                     <label class="sr-only">Login</label>

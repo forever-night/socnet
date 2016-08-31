@@ -27,7 +27,7 @@
                             ng-click="setAccountSelected(true)"><a href="#">Account</a></li>
                     </ul>
                     <div ng-show="profileSelected" style="margin-top:30px;">
-                        <form name="profileForm" class="ng-pristine ng-valid col-md-8 col-md-offset-2">
+                        <form name="profileForm" class="ng-pristine ng-valid col-sm-8 col-sm-offset-2">
                             <div class="form-group input-group-sm">
                                 <label for="inputName">Name</label>
                                 <input id="inputName" type="text" class="form-control" ng-model="profile.name"

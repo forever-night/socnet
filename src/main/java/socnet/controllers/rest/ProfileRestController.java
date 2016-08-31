@@ -13,8 +13,10 @@ import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 import socnet.util.Global;
 
+import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -51,6 +53,30 @@ public class ProfileRestController {
     @RequestMapping(path = "/{login}", method = RequestMethod.GET)
     public ProfileDto getProfileByLogin(@PathVariable String login) {
         return profileMapper.asProfileDto(profileService.findByLogin(login));
+    }
+    
+    @RequestMapping(params = "search", method = RequestMethod.GET)
+    public List<ProfileDto> getProfilesLikeLogin(@RequestParam(name = "search") String login)
+            throws EmptyRequestException {
+        if (login.isEmpty())
+            throw new EmptyRequestException();
+        
+        Map<String, Profile> entityMap = profileService.findAllLikeLogin(login);
+        
+        if (entityMap == null || entityMap.isEmpty())
+            throw new NoResultException();
+        
+        
+        List<ProfileDto> dtoList = new ArrayList<>();
+        ProfileDto temp;
+        
+        for (Map.Entry<String, Profile> entry : entityMap.entrySet()) {
+            temp = profileMapper.asProfileDto(entry.getValue());
+            temp.setLogin(entry.getKey());
+            dtoList.add(temp);
+        }
+        
+        return dtoList;
     }
 
     @RequestMapping(path = "/{login}", method = RequestMethod.PUT)

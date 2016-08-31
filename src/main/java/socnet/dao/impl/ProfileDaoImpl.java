@@ -8,7 +8,7 @@ import socnet.entities.Profile;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
+import java.util.*;
 
 
 @Component
@@ -34,7 +34,42 @@ public class ProfileDaoImpl implements ProfileDao{
     public List<Profile> findAll() {
         return em.createQuery("from Profile", Profile.class).getResultList();
     }
-
+    
+    @Override
+    public Map<String, Profile> findAllLikeLogin(String login) {
+        Query query = em.createQuery("select new map(a.login as login, " +
+                "p.name as name, p.country as country, p.phone as phone, p.info as info, p.currentCity as city, " +
+                "p.dateOfBirth as dateOfBirth) " +
+                "from Profile as p, Account as a " +
+                "where p.id = a.id " +
+                "and (a.login like lower(:login) or p.name like lower(:login))");
+        query.setParameter("login", "%" + login + "%");
+        
+        List<Map<String, Object>> queryResultList = query.getResultList();
+        
+        if (queryResultList.isEmpty())
+            return null;
+        
+        
+        Map<String, Profile> result = new HashMap<>();
+        
+        for (Map<String, Object> map : queryResultList) {
+            String resultLogin = (String) map.get("login");
+            
+            Profile profile = new Profile();
+            profile.setName((String) map.get("name"));
+            profile.setCountry((String) map.get("country"));
+            profile.setPhone((String) map.get("phone"));
+            profile.setInfo((String) map.get("info"));
+            profile.setCurrentCity((String) map.get("city"));
+            profile.setDateOfBirth((Date) map.get("dateOfBirth"));
+    
+            result.put(resultLogin, profile);
+        }
+        
+        return result;
+    }
+    
     @Override
     public Integer persist(Profile profile) {
         em.persist(profile);

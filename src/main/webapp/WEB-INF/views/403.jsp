@@ -6,7 +6,7 @@
         <title>HTTP 403</title>
     </jsp:attribute>
     <jsp:body>
-        <div class="col-md-6" style="margin-top:60px;">
+        <div class="col-sm-6" style="margin-top:60px;">
             <div><img width="505" height="396" src="${pageContext.request.contextPath}/static/img/grumpycat.png"/></div>
             <div class="alert alert-danger" role="alert">
                 <b>Oops!</b><br>

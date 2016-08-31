@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ tag description="Owner menu template" pageEncoding="UTF-8" %>
 
-<div class="pull-left col-md-2 col-md-offset-2" style="margin-top:50px;">
+<div class="pull-left col-sm-2 col-sm-offset-2" style="margin-top:50px;">
     <ul class="nav nav-pills nav-stacked">
         <li><h6><a href="${pageContext.request.contextPath}/profile">Profile</a></h6></li>
         <li><h6><a href="${pageContext.request.contextPath}/private">Messages</a></h6></li>

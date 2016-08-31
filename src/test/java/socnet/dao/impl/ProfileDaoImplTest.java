@@ -3,6 +3,7 @@ package socnet.dao.impl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -15,11 +16,14 @@ import socnet.entities.Profile;
 
 import javax.persistence.NoResultException;
 
+import java.util.*;
+
 import static org.junit.Assert.*;
 import static socnet.util.TestUtil.generateAccount;
 import static socnet.util.TestUtil.generateProfile;
 
 
+@ActiveProfiles("test")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
 @WebAppConfiguration
@@ -84,6 +88,47 @@ public class ProfileDaoImplTest {
     @Test(expected = NoResultException.class)
     public void findByLoginIfNotExists() {
         Profile actual = profileDao.findByLogin("testtest");
+    }
+    
+    @Test
+    public void findAllLikeLoginIfExists() {
+        String searchPattern = "testTEST";
+        int iterations = 3;
+        
+        List<Account> expectedAccounts = new ArrayList<>();
+        List<Profile> expectedProfiles = new ArrayList<>();
+        
+        for (int i = 0; i < iterations; i++) {
+            Account a = generateAccount(i + searchPattern + i);
+            accountDao.persist(a);
+            expectedAccounts.add(a);
+            
+            Profile p = generateProfile(a);
+            p.setId(a.getId());
+            profileDao.persist(p);
+            expectedProfiles.add(p);
+        }
+        
+        Account a = generateAccount("bbb");
+        accountDao.persist(a);
+    
+        Profile p = generateProfile(a);
+        p.setId(a.getId());
+        profileDao.persist(p);
+        
+        
+        Map<String, Profile> actual = profileDao.findAllLikeLogin(searchPattern.toUpperCase());
+            
+        assertNotNull(actual);
+        assertTrue(actual.size() > 0);
+        assertFalse(actual.containsKey(a.getLogin()));
+        assertFalse(actual.containsValue(p));
+        
+        for (int i = 0; i < iterations; i++) {
+            assertTrue(actual.containsKey(expectedAccounts.get(i).getLogin()));
+            assertTrue(actual.containsValue(expectedProfiles.get(i)));
+            assertEquals(expectedProfiles.get(i), actual.get(expectedAccounts.get(i).getLogin()));
+        }
     }
     
     @Test

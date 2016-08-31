@@ -12,6 +12,7 @@ public class ProfileDto implements Serializable {
     private String phone;
     private String info;
     private Date dateOfBirth;
+    private String login;
     
     public String getName() {
         return name;
@@ -59,6 +60,14 @@ public class ProfileDto implements Serializable {
     
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+    
+    public String getLogin() {
+        return login;
+    }
+    
+    public void setLogin(String login) {
+        this.login = login;
     }
     
     @Override

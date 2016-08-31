@@ -5,12 +5,12 @@ import socnet.dto.ProfileDto;
 import socnet.entities.Profile;
 
 
-@Mapper(withCustomFields = {
-    @Field({"city", "currentCity"})}, withIoC = IoC.SPRING)
+@Mapper(withIoC = IoC.SPRING, withIgnoreMissing = IgnoreMissing.ALL,
+        withCustomFields = {@Field({"city", "currentCity"})})
 public interface ProfileMapper {
-    @Maps(withIgnoreMissing = IgnoreMissing.DESTINATION)
+    @Maps
     ProfileDto asProfileDto(Profile source);
     
-    @Maps(withIgnoreMissing = IgnoreMissing.SOURCE)
+    @Maps
     Profile asProfile(ProfileDto source);
 }
