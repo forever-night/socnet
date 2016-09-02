@@ -29,12 +29,11 @@ public class SettingsController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String settings(Model model) {
-        String login = userService.getCurrentLogin();
+        String currentLogin = userService.getCurrentLogin();
     
-        if (login == null)
+        if (currentLogin == null)
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
-        model.addAttribute("login", login);
         return "settings";
     }
 }

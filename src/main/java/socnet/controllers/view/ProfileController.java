@@ -29,27 +29,26 @@ public class ProfileController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String profile(Model model) {
-        String login = userService.getCurrentLogin();
+    public String profile() {
+        String currentLogin = userService.getCurrentLogin();
         
-        if (login == null)
+        if (currentLogin == null)
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
-        model.addAttribute("login", login);
         return "profile";
     }
     
-    @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-    public String profile(@PathVariable String login, Model model) {
+    @RequestMapping(value = "/{profileLogin}", method = RequestMethod.GET)
+    public String profile(@PathVariable String profileLogin, Model model) {
         String currentLogin = userService.getCurrentLogin();
         
-        if (login == null || login.isEmpty())
-            login = currentLogin;
+        if (profileLogin == null || profileLogin.isEmpty())
+            profileLogin = currentLogin;
             
         if (currentLogin == null)
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
-        model.addAttribute("login", login);
+        model.addAttribute("profileLogin", profileLogin);
         return "profile";
     }
 }

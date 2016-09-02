@@ -1,9 +1,8 @@
 app.controller('ProfileCtrl', function($scope, $http, $window) {
     $scope.profile = null;
-    $scope.isOwner = false;
     
 
-    $scope.getProfile = function() {
+    $scope.getProfile = function(login) {
         return $http.get(restUrl.profile + "/" + login).then(
             function success(response) {
                 if (response.status == 204)
@@ -29,5 +28,8 @@ app.controller('ProfileCtrl', function($scope, $http, $window) {
     };
 
 
-    $scope.getProfile();
+    if (typeof profileOwner !== "undefined" && profileOwner != null)
+        $scope.getProfile(profileOwner);
+    else
+        $scope.getProfile(login);
 });

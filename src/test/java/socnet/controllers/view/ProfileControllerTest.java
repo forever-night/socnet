@@ -45,9 +45,7 @@ public class ProfileControllerTest {
                 .thenReturn(expectedUsername);
         
         mockMvc.perform(get("/profile"))
-                .andExpect(view().name("profile"))
-                .andExpect(model().attributeExists("login"))
-                .andExpect(model().attribute("login", expectedUsername));
+                .andExpect(view().name("profile"));
     }
 
     @Test(expected = NestedServletException.class)
@@ -69,8 +67,8 @@ public class ProfileControllerTest {
         
         mockMvc.perform(get("/profile/" + expectedLogin))
                 .andExpect(view().name("profile"))
-                .andExpect(model().attributeExists("login"))
-                .andExpect(model().attribute("login", expectedLogin));
+                .andExpect(model().attributeExists("profileLogin"))
+                .andExpect(model().attribute("profileLogin", expectedLogin));
     }
     
     @Test(expected = NestedServletException.class)

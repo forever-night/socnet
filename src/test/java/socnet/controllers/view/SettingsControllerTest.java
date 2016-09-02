@@ -46,9 +46,7 @@ public class SettingsControllerTest {
                 .thenReturn(expectedLogin);
 
         mockMvc.perform(get("/settings"))
-                .andExpect(view().name("settings"))
-                .andExpect(model().attributeExists("login"))
-                .andExpect(model().attribute("login", expectedLogin));
+                .andExpect(view().name("settings"));
     }
     
     @Test(expected = NestedServletException.class)
