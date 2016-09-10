@@ -12,13 +12,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 import socnet.dto.ProfileDto;
+import socnet.entities.Account;
 import socnet.entities.Profile;
 import socnet.mappers.ProfileMapper;
 import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
+import javax.persistence.NoResultException;
+import java.util.*;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -43,14 +44,14 @@ public class ProfileRestControllerTest {
     ProfileMapper profileMapperMock;
     
     @Mock
-    UserService userService;
+    UserService userServiceMock;
     
     private ProfileDto profileDto;
     private Profile profile;
     
     @Before
     public void setUp() {
-        controller = new ProfileRestController(profileServiceMock, profileMapperMock, userService);
+        controller = new ProfileRestController(profileServiceMock, profileMapperMock, userServiceMock);
         stringHttpMessageConverter = stringHttpMessageConverter();
         jackson2HttpMessageConverter = jackson2HttpMessageConverter();
         
@@ -97,13 +98,43 @@ public class ProfileRestControllerTest {
     }
     
     @Test
+    public void getFollowersByLoginExists() throws Exception {
+        int resultSize = 3;
+        List<ProfileDto> result = new ArrayList<>();
+        
+        for (int i = 0; i < resultSize; i++) {
+            Account account = generateAccount("a" + i);
+            Profile profile = generateProfile(account);
+            ProfileDto profileDto = generateProfileDto(profile);
+            
+            result.add(profileDto);
+        }
+        
+        String json = toJson(result, jackson2HttpMessageConverter());
+                
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn("aaa");
+        
+        when(profileServiceMock.findFollowersWithLogin(any(String.class)))
+                .thenReturn(result);
+        
+        when(profileMapperMock.asProfileDto(any()))
+                .thenReturn(generateProfileDto());
+        
+        
+        mockMvc.perform(get("/api/profile/test/followers"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json));
+    }
+    
+    @Test
     public void updateNotNull() throws Exception {
         String json = toJson(profileDto, jackson2HttpMessageConverter());
         
         when(profileMapperMock.asProfile(profileDto))
                 .thenReturn(profile);
         
-        when(userService.getCurrentLogin())
+        when(userServiceMock.getCurrentLogin())
                 .thenReturn("test");
         
         when(profileServiceMock.update(profile))
@@ -120,13 +151,66 @@ public class ProfileRestControllerTest {
     public void updateDifferentLoginOwner() throws Exception {
         String json = toJson(profileDto, jackson2HttpMessageConverter());
     
-        when(userService.getCurrentLogin())
+        when(userServiceMock.getCurrentLogin())
                 .thenReturn("aaa");
     
     
         mockMvc.perform(put("/api/profile/test")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes()))
+                .andReturn();
+    }
+    
+    @Test
+    public void followNotNull() throws Exception {
+        String currentLogin = "aaa";
+        String toFollow = "bbb";
+        
+        Profile profile = generateProfile();
+        
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(currentLogin);
+        
+        when(profileServiceMock.findByLogin(any()))
+                .thenReturn(profile);
+        
+        when(profileServiceMock.addFollower(any(), any()))
+                .thenReturn(profile);
+        
+        mockMvc.perform(put("/api/profile/" + toFollow)
+                .param("follow", ""))
+                .andExpect(status().isOk());
+    }
+    
+    @Test(expected = NestedServletException.class)
+    public void followNotLoggedIn() throws Exception {
+        String toFollow = "bbb";
+    
+        Profile profile = generateProfile();
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(null);
+        
+        mockMvc.perform(put("/api/profile/" + toFollow)
+                .param("follow", ""))
+                .andReturn();
+    }
+    
+    @Test(expected = NestedServletException.class)
+    public void followLoginNotFound() throws Exception {
+        String currentLogin = "aaa";
+        String toFollow = "bbb";
+    
+        Profile profile = generateProfile();
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(currentLogin);
+    
+        when(profileServiceMock.findByLogin(toFollow))
+                .thenThrow(NoResultException.class);
+    
+        mockMvc.perform(put("/api/profile/" + toFollow)
+                .param("follow", ""))
                 .andReturn();
     }
 }

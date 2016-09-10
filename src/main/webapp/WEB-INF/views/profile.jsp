@@ -6,22 +6,25 @@
 <jsp:attribute name="head">
     <sec:authentication property="principal.username" var="currentLogin"/>
     <c:if test = "${profileLogin != null}">
-        <script>var profileOwner = "${profileLogin}";</script>
+        <script>var ownerLogin = "${profileLogin}";</script>
     </c:if>
-    <script>var login = "${currentLogin}";</script>
+    <script>var currentLogin = "${currentLogin}";</script>
     <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
     <script src="<c:url value='/static/js/profileController.js'/>"></script>
+    <sec:csrfMetaTags/>
     <title>profile</title>
 </jsp:attribute>
 <jsp:body>
     <t:owner></t:owner>
     <div ng-controller="ProfileCtrl">
         <t:main_panel>
-        <jsp:attribute name="panel_title"><strong>{{profile.name}}</strong></jsp:attribute>
+        <jsp:attribute name="panel_title"><strong>@{{profileLogin}}</strong></jsp:attribute>
         <jsp:attribute name="panel_body">
         <div>
             <div>
                 <dl class="dl-horizontal">
+                    <dt>Name:</dt>
+                    <dd>{{profile.name}}</dd>
                     <dt>Birthday:</dt>
                     <dd>{{profile.dateOfBirth}}</dd>
                     <dt>Country:</dt>
@@ -34,15 +37,18 @@
                     <dd>{{profile.info}}</dd>
                 </dl>
             </div>
-            <div class="pull-left">
+            <div class="pull-left col-md-4 col-sm-6" style="margin-top:1em">
                 <c:if test="${profileLogin != null && profileLogin != currentLogin}">
                     <ul class="nav nav-pills nav-stacked">
-                        <li><h6><a href="#">Follow</a></h6></li>
-                        <li><h6><a href="#">Private Message</a></h6></li>
+                        <button ng-click="follow(profileLogin)"
+                           class="btn btn-sm btn-default col-sm-12 text-left">Follow</button>
+                        <button class="btn btn-sm btn-primary col-sm-12">Private Message</button>
                     </ul>
                 </c:if>
-                <ul class="nav nav-pills nav-stacked">
-                    <li><h6><a href="${pageContext.request.contextPath}/followers">Followers</a></h6></li>
+                <ul class="nav nav-pills nav-stacked" style="margin-top:1em;">
+                    <li>
+                        <h6><a href="${pageContext.request.contextPath}/followers/{{profileLogin}}">Followers</a></h6>
+                    </li>
                     <li><h6><a href="${pageContext.request.contextPath}/communities">Communities</a></h6></li>
                 </ul>
             </div>

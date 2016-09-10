@@ -11,7 +11,7 @@
     <script src="<c:url value='/static/js/lib/bootstrap.min.js'/>"></script>
     <script src="<c:url value='/static/js/lib/angular.min.js'/>"></script>
     <script>context = "${pageContext.request.contextPath}"; </script>
-    <script src="<c:url value='/static/js/controllers.js'/>"></script>
+    <script src="<c:url value='/static/js/mainController.js'/>"></script>
     <sec:authentication property='principal' var="principal" scope="request"/>
     <jsp:invoke fragment="head"/>
 </head>

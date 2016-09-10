@@ -1,11 +1,13 @@
 var paramSearchQuery;
 
-app.controller('SearchResultCtrl', function($scope, SearchService, StatusService){
+app.controller('SearchResultCtrl', function($scope, SearchService, StatusService, ProfileService){
     $scope.searchQuery = paramSearchQuery != null ? paramSearchQuery : '';
     $scope.searchResult = [];
+    $scope.currentLogin = currentLogin;
 
     var searchResult = [];
     var status = document.getElementById('status');
+    var csrfToken = document.getElementsByName('_csrf')[0].content;
 
 
     $scope.search = function(query) {
@@ -31,12 +33,22 @@ app.controller('SearchResultCtrl', function($scope, SearchService, StatusService
                 });
             },
             function error(response) {
-                console.log(response);
-
                 var errorMessage = response.status == 400 ? message.error.queryEmpty : 'Error ' + response.status;
                 StatusService.setStatus(status, false, errorMessage);
             }
         );
+    };
+
+    $scope.follow = function (toFollow, searchResultIndex) {
+        return ProfileService.follow(toFollow, csrfToken).then(
+            function success(response) {
+                if (response == 200) {
+                    console.log('following');
+                    $scope.searchResult[searchResultIndex].isFollowing = true;
+                //    TODO display 'unfollow' button
+                }
+            }
+        )
     };
 
 

@@ -1,5 +1,7 @@
 package socnet.controllers.rest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +80,21 @@ public class ProfileRestController {
         
         return dtoList;
     }
+    
+    @RequestMapping(path = "/{login}/followers", method = RequestMethod.GET)
+    public List<ProfileDto> getFollowersByLogin(@PathVariable String login) throws EmptyRequestException {
+        if (login == null || login.isEmpty())
+            throw new EmptyRequestException();
+        
+        
+        String currentLogin = userService.getCurrentLogin();
+    
+        if (currentLogin == null)
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
+        
+        
+        return profileService.findFollowersWithLogin(login);
+    }
 
     @RequestMapping(path = "/{login}", method = RequestMethod.PUT)
     public ResponseEntity update(@RequestBody ProfileDto profileDto, @PathVariable String login)
@@ -88,12 +105,27 @@ public class ProfileRestController {
         
         String currentLogin = userService.getCurrentLogin();
         
-        if (!login.equals(currentLogin))
+        if (currentLogin == null || !login.equals(currentLogin))
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
         
         Profile profile = profileMapper.asProfile(profileDto);
         profileService.update(profile, login);
+        
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{loginToFollow}", params = "follow", method = RequestMethod.PUT)
+    public ResponseEntity follow(@PathVariable() String loginToFollow) {
+        String currentLogin = userService.getCurrentLogin();
+        
+        if (currentLogin == null)
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
+        
+        Profile toFollow = profileService.findByLogin(loginToFollow);
+        Profile follower = profileService.findByLogin(currentLogin);
+        
+        profileService.addFollower(toFollow, follower);
         
         return new ResponseEntity(HttpStatus.OK);
     }
