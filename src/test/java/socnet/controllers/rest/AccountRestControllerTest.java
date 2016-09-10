@@ -59,7 +59,7 @@ public class AccountRestControllerTest {
         account = TestUtil.generateAccount();
     }
     
-//    fails if AccoundDto.getPassword is annotated with JsonIgnore
+//    fails if AccountDto.getPassword is annotated with JsonIgnore
 //    @Test
     public void signUpNotNull() throws Exception {
         String json = TestUtil.toJson(accountDto, jackson2HttpMessageConverter);
@@ -115,27 +115,54 @@ public class AccountRestControllerTest {
                 .andReturn();
     }
     
-    @Test
-    public void updatePasswordNotNull() throws Exception {
+//    fails if AccountDto.getPassword is annotated with JsonIgnore
+//    @Test
+    public void updatePasswordOldPasswordValid() throws Exception {
+        String oldPassword = "old";
+        accountDto.setPassword("test");
+        accountDto.setOldPassword(oldPassword);
+        
         String json = TestUtil.toJson(accountDto, jackson2HttpMessageConverter);
-    
+
         when(accountMapperMock.asAccount(accountDto))
                 .thenReturn(account);
-        
-        when(accountServiceMock.updatePassword(account))
+
+        when(accountServiceMock.updatePassword(account, oldPassword))
                 .thenReturn(account);
-        
-        
+
+
         mockMvc.perform(put("/api/account/" + accountDto.getLogin() + "/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes()))
                 .andExpect(status().isOk());
     }
     
+    //    fails if AccountDto.getPassword is annotated with JsonIgnore
+//    @Test
+    public void updatePasswordOldPasswordInvalid() throws Exception {
+        String oldPassword = "old";
+        accountDto.setPassword("test");
+        accountDto.setOldPassword(oldPassword);
+    
+        String json = TestUtil.toJson(accountDto, jackson2HttpMessageConverter);
+    
+        when(accountMapperMock.asAccount(accountDto))
+                .thenReturn(account);
+    
+        when(accountServiceMock.updatePassword(account, oldPassword))
+                .thenReturn(null);
+    
+    
+        mockMvc.perform(put("/api/account/" + accountDto.getLogin() + "/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.getBytes()))
+                .andExpect(status().isUnauthorized());
+    }
+    
     @Test(expected = NestedServletException.class)
     public void updatePasswordDifferentLoginOwner() throws Exception {
         String json = TestUtil.toJson(accountDto, jackson2HttpMessageConverter);
-    
+
         mockMvc.perform(put("/api/account/" + accountDto.getLogin() + "aaa" + "/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes()))

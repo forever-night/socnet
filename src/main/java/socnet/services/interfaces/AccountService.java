@@ -14,7 +14,7 @@ public interface AccountService {
 
     Account updateEmail(Account account);
 
-    Account updatePassword(Account account);
+    Account updatePassword(Account account, String oldPassword);
 
     void remove(Account account);
 

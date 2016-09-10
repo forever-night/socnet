@@ -175,6 +175,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService,
 
         var newAccount = copy($scope.account);
         newAccount.password = newPassword.value;
+        newAccount.oldPassword = oldPassword.value;
 
 
         AccountService.putPassword(login, newAccount, csrfToken).then(
@@ -186,8 +187,11 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService,
                 confirmPassword.value = '';
             },
             function error(response) {
-                StatusService.setStatus(statusElement.password, false,
-                    message.error.internalError + ': ' + response.status);
+                if (response.status == 401)
+                    StatusService.setStatus(statusElement.password, false, message.error.wrongPassword);
+                else
+                    StatusService.setStatus(statusElement.password, false,
+                        message.error.internalError + ': ' + response.status);
             }
         );
     };

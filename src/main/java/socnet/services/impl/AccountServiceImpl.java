@@ -21,6 +21,12 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
     
+    public AccountServiceImpl(AccountDao accountDao, ProfileService profileService, PasswordEncoder passwordEncoder) {
+        this.accountDao = accountDao;
+        this.profileService = profileService;
+        this.passwordEncoder = passwordEncoder;
+    }
+    
     @Override
     @Transactional
     public int signUp(Account account) {
@@ -69,16 +75,19 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     @Transactional
-    public Account updatePassword(Account account) {
+    public Account updatePassword(Account account, String oldPassword) {
         Account oldAccount = accountDao.findByLogin(account.getLogin());
+        
+        if (passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+            String newPassword = encodePassword(account.getPassword());
     
-        String password = encodePassword(account.getPassword());
-        
-        if (oldAccount.getPassword().equals(password))
-            return oldAccount;
-        
-        oldAccount.setPassword(password);
-        return accountDao.update(oldAccount);
+            if (oldAccount.getPassword().equals(newPassword))
+                return oldAccount;
+    
+            oldAccount.setPassword(newPassword);
+            return accountDao.update(oldAccount);
+        } else
+            return null;
     }
     
     @Override

@@ -74,31 +74,34 @@ public class AccountRestController {
     @RequestMapping(path = "/{login}/password", method = RequestMethod.PUT)
     public ResponseEntity updatePassword(@RequestBody AccountDto accountDto, @PathVariable String login)
             throws EmptyRequestException {
-        if (accountDto == null || login == null)
+        if (accountDto == null || login == null || accountDto.getPassword() == null ||
+                accountDto.getOldPassword() == null || accountDto.getOldPassword().isEmpty())
             throw new EmptyRequestException();
         else if (!login.equals(accountDto.getLogin()))
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
-        
         Account account = accountMapper.asAccount(accountDto);
-        accountService.updatePassword(account);
+        Account updated = accountService.updatePassword(account, accountDto.getOldPassword());
         
-        return new ResponseEntity(HttpStatus.OK);
+        if (updated == null){
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        } else
+            return new ResponseEntity(HttpStatus.OK);
     }
 
     @RequestMapping(path = "/{login}", method = RequestMethod.DELETE)
     public ResponseEntity delete(@PathVariable String login) throws EmptyRequestException {
         if (login == null || login.isEmpty())
             throw new EmptyRequestException();
-        
-        
+                
         String currentLogin = userService.getCurrentLogin();
         
         if (!login.equals(currentLogin))
             throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
         
         
-        Account account = accountService.findByLogin(login);
+        Account account = new Account();
+        account.setLogin(login);
         accountService.remove(account);
         
         return new ResponseEntity(HttpStatus.OK);

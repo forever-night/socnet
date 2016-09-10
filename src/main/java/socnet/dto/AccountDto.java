@@ -11,6 +11,7 @@ public class AccountDto implements Serializable {
     private String login;
     private String email;
     private String password;
+    private String oldPassword;
     
     public String getLogin() {
         return login;
@@ -38,6 +39,14 @@ public class AccountDto implements Serializable {
         this.password = password;
     }
     
+    public String getOldPassword() {
+        return oldPassword;
+    }
+    
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,6 +68,7 @@ public class AccountDto implements Serializable {
                 "login=" + login +
                 ", email=" + email +
                 ", password=" + password +
+                ", oldPassword=" + oldPassword +
                 "}";
     }
 }

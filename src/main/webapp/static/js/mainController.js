@@ -38,6 +38,7 @@ message = {
         emailNotModified: 'e-mail is not modified',
         loginTaken: 'Login is taken, try a different one',
         passwordMatch: 'Passwords should match',
+        wrongPassword: 'Invalid old password',
         profileNotFound: 'Profile not found',
         accountNotFound: 'Account not found',
         internalError: 'Internal server error'
