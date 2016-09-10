@@ -90,6 +90,19 @@ public class TestUtil {
         return profileDto;
     }
     
+    public static ProfileDto generateProfileDto(Profile profile) {
+        ProfileDto profileDto = new ProfileDto();
+        
+        profileDto.setName(profile.getName());
+        profileDto.setCountry(profile.getCountry());
+        profileDto.setCity(profile.getCurrentCity());
+        profileDto.setPhone(profile.getPhone());
+        profileDto.setDateOfBirth(profile.getDateOfBirth());
+        profileDto.setInfo(profile.getInfo());
+        
+        return profileDto;
+    }
+    
     public static String toJson(Object object, MappingJackson2HttpMessageConverter jackson2HttpMessageConverter)
             throws JsonProcessingException {
         return jackson2HttpMessageConverter.getObjectMapper().writeValueAsString(object);

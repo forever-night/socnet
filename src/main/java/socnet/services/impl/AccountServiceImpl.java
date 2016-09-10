@@ -83,19 +83,16 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     @Transactional
-    public int remove(Account account) {
-        Account persistent = accountDao.find(account.getId());
+    public void remove(Account account) {
+        Account persistent;
         
-        if (persistent == null)
-            return -1;
+        if (account.getId() != null)
+            persistent = accountDao.find(account.getId());
+        else
+            persistent = accountDao.findByLogin(account.getLogin());
         
-        if (persistent.getLogin().equals(account.getLogin())) {
-            profileService.remove(account.getId());
-            accountDao.remove(account);
-            
-            return 0;
-        } else
-            return 1;
+        profileService.remove(persistent.getId());
+        accountDao.remove(persistent);
     }
     
     @Override

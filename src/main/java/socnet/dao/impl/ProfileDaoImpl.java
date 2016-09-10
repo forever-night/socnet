@@ -6,6 +6,7 @@ import socnet.dao.interfaces.ProfileDao;
 import socnet.entities.Profile;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.*;
@@ -36,6 +37,7 @@ public class ProfileDaoImpl implements ProfileDao{
     }
     
     @Override
+    @Transactional
     public Map<String, Profile> findAllLikeLogin(String login) {
         Query query = em.createQuery("select new map(a.login as login, " +
                 "p.name as name, p.country as country, p.phone as phone, p.info as info, p.currentCity as city, " +
@@ -49,25 +51,112 @@ public class ProfileDaoImpl implements ProfileDao{
         
         if (queryResultList.isEmpty())
             return null;
-        
-        
-        Map<String, Profile> result = new HashMap<>();
-        
-        for (Map<String, Object> map : queryResultList) {
-            String resultLogin = (String) map.get("login");
-            
-            Profile profile = new Profile();
-            profile.setName((String) map.get("name"));
-            profile.setCountry((String) map.get("country"));
-            profile.setPhone((String) map.get("phone"));
-            profile.setInfo((String) map.get("info"));
-            profile.setCurrentCity((String) map.get("city"));
-            profile.setDateOfBirth((Date) map.get("dateOfBirth"));
+        else
+            return mapResultListAsLoginProfileMap(queryResultList);
+    }
     
-            result.put(resultLogin, profile);
-        }
+    @Override
+    public Set<Profile> findFollowers(Profile profile) {
+        Profile persisted = em.find(Profile.class, profile.getId());
         
-        return result;
+        if (persisted == null)
+            throw new NoResultException();
+        
+        Set<Profile> followers = persisted.getFollowers();
+        
+        return followers == null || followers.isEmpty() ? null : new HashSet<>(followers);
+    }
+    
+    @Override
+    public Set<Profile> findFollowers(String login) {
+        Profile profile = findByLogin(login);
+        return findFollowers(profile);
+    }
+    
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public Map<String, Profile> findFollowersWithLogin(Profile profile) {
+        Profile persisted = em.find(Profile.class, profile.getId());
+        
+        if (persisted == null)
+            throw new NoResultException();
+        
+        Query query = em.createQuery("select new map(a.login as login, " +
+                "f.name as name, f.country as country, f.phone as phone, f.info as info, f.currentCity as city, " +
+                "f.dateOfBirth as dateOfBirth) " +
+                "from Profile p join p.followers f, Account a " +
+                "where f.id = a.id and p.id = :id");
+        
+        query.setParameter("id", persisted.getId());
+    
+        List<Map<String, Object>> queryResultList = query.getResultList();
+    
+    
+        if (queryResultList == null || queryResultList.isEmpty())
+            return null;
+        else
+            return mapResultListAsLoginProfileMap(queryResultList);
+    }
+    
+    @Override
+    @Transactional
+    public Map<String, Profile> findFollowersWithLogin(String login) {
+        Profile p = findByLogin(login);
+        return findFollowersWithLogin(p);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public Set<Profile> findFollowing(Profile profile) {
+        Profile persisted = em.find(Profile.class, profile.getId());
+        
+        if (persisted == null)
+            throw new NoResultException();
+        
+        Query query = em.createQuery("select p from Profile p inner join p.followers f where f.id = :id");
+        query.setParameter("id", profile.getId());
+        
+        List<Profile> followers = query.getResultList();
+        
+        return followers == null || followers.isEmpty() ? null : new HashSet<>(followers);
+    }
+    
+    @Override
+    @Transactional
+    public Set<Profile> findFollowing(String login) {
+        Profile p = findByLogin(login);
+        return findFollowing(p);
+    }
+    
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public Map<String, Profile> findFollowingWithLogin(Profile profile) {
+        Profile persisted = em.find(Profile.class, profile.getId());
+        
+        if (persisted == null)
+            throw new NoResultException();
+        
+        Query query = em.createQuery("select new map(a.login as login, " +
+                "p.name as name, p.country as country, p.phone as phone, p.info as info, p.currentCity as city, " +
+                "p.dateOfBirth as dateOfBirth) " +
+                "from Profile p join p.followers f, Account a " +
+                "where p.id = a.id and f.id = :id");
+        
+        query.setParameter("id", profile.getId());
+        List<Map<String, Object>> queryResultList = query.getResultList();
+        
+        if (queryResultList == null || queryResultList.isEmpty())
+            return null;
+        else
+            return mapResultListAsLoginProfileMap(queryResultList);
+    }
+    
+    @Override
+    public Map<String, Profile> findFollowingWithLogin(String login) {
+        Profile profile = findByLogin(login);
+        return findFollowingWithLogin(profile);
     }
     
     @Override
@@ -114,17 +203,71 @@ public class ProfileDaoImpl implements ProfileDao{
     }
     
     @Override
-    public void remove(Integer id) {
-        Profile old = em.find(Profile.class, id);
-
-        em.remove(old);
+    @Transactional
+    public Profile updateFollowers(Profile profile) {
+        Profile old = em.find(Profile.class, profile.getId());
+        old.setFollowers(profile.getFollowers());
+        
+        return em.merge(old);
+    }
+    
+    @Override
+    @Transactional
+    public Profile updateFollowers(Profile profile, String login) {
+        Profile old;
+        
+        if (profile.getId() != null)
+            old = em.find(Profile.class, profile.getId());
+        else
+            old = findByLogin(login);
+        
+        old.setFollowers(profile.getFollowers());
+        
+        return em.merge(old);
     }
 
     @Override
     @Transactional
     public void remove(Profile profile) {
-        Profile old = em.find(Profile.class, profile.getId());
-
-        em.remove(old);
+//        TODO fix removal of followers and following
+//        Profile old = em.find(Profile.class, profile.getId());
+//        Set<Profile> oldFollowerSet = findFollowersWithLogin(old);
+//        Set<Profile> oldFollowingSet = findFollowingWithLogin(old);
+//
+//
+//        if (oldFollowerSet != null && !oldFollowerSet.isEmpty()) {
+//            oldFollowerSet.removeAll(oldFollowerSet);
+//
+//            updateFollowers(old);
+//        }
+//
+//        if (oldFollowingSet != null && !oldFollowingSet.isEmpty())
+//            for (Profile following : oldFollowingSet) {
+//                following.getFollowers().remove(old);
+//                em.merge(following);
+//                em.flush();
+//            }
+        
+//        em.remove(old);
+    }
+    
+    private Map<String, Profile> mapResultListAsLoginProfileMap(List<Map<String, Object>> queryResultList) {
+        Map<String, Profile> resultMap = new HashMap<>();
+    
+        for (Map<String, Object> map : queryResultList) {
+            String resultLogin = (String) map.get("login");
+        
+            Profile profile = new Profile();
+            profile.setName((String) map.get("name"));
+            profile.setCountry((String) map.get("country"));
+            profile.setPhone((String) map.get("phone"));
+            profile.setInfo((String) map.get("info"));
+            profile.setCurrentCity((String) map.get("city"));
+            profile.setDateOfBirth((Date) map.get("dateOfBirth"));
+        
+            resultMap.put(resultLogin, profile);
+        }
+    
+        return resultMap;
     }
 }

@@ -1,6 +1,11 @@
 package socnet.entities;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +31,7 @@ public class Profile implements Serializable {
     @Column(name = "birth_date")
     private Date dateOfBirth;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "profile_follower",
                 joinColumns = {@JoinColumn(name = "owner_id")},
                 inverseJoinColumns = {@JoinColumn(name = "follower_id")})
