@@ -1,4 +1,4 @@
-app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService, StatusService) {
+app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService, ValidateService, StatusService, AccountService) {
     $scope.profileSelected = true;
     $scope.accountSelected = false;
     $scope.profile = null;
@@ -19,9 +19,6 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         account : document.getElementById('tabAccount')
     };
 
-
-    var emailUpdateStatus, passwordUpdateStatus, deleteStatus;
-
     var csrfToken = document.getElementsByName('_csrf')[0].content;
 
 
@@ -32,120 +29,31 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
 
 
     $scope.getProfile = function () {
-        return $http.get(restUrl.profile + "/" + login).then(
-            function (response) {
-                if (response.status == 204)
-                    $window.location.href = url.error + '?errorMessage=' + message.error.profileNotFound;
-                else {
-                    var data = response.data;
-
-                    if (data != null)
-                        $scope.profile = new Profile(
-                            data.name,
-                            data.dateOfBirth,
-                            data.phone,
-                            data.country,
-                            data.city,
-                            data.info
-                        );
-                }
+        return ProfileService.get(login).then(
+            function success(response) {
+                if (response == null)
+                    $window.location.href = url.errorWithMessage + message.error.profileNotFound;
+                else
+                    $scope.profile = response;
             },
-            function (response) {
-                $window.location.href = url.error + '?errorMessage=Error ' + response.status;
+            function error(response) {
+                $window.location.href = url.errorWithMessage + 'Error ' + response.status;
             }
         );
     };
 
-    $scope.putProfile = function (data) {
-        var config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN' : csrfToken
-            }
-        };
-
-        return $http.put(restUrl.profile + "/" + $scope.account.login, data, config);
-    };
-
     $scope.getAccount = function () {
-        return $http.get(restUrl.account + "/" + login).then(
-            function (response) {
-                if (response.status == 204)
-                    $window.location.href = url.error + '?errorMessage=' + message.error.accountNotFound;
+        return AccountService.get(login).then(
+            function success(response) {
+                if (response == null)
+                    $window.location.href = url.errorWithMessage + message.error.accountNotFound;
                 else {
-                    var data = response.data;
-
-                    if (data != null)
-                        $scope.account = new Account(
-                            data.login,
-                            data.email);
-
+                    $scope.account = response;
                     $scope.newAccount = copy($scope.account);
                 }
             },
             function error(response) {
-                $window.location.href = url.error + '?errorMessage=Error ' + response.status;
-            }
-        );
-    };
-
-    $scope.putAccountEmail = function (data) {
-        var config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN' : csrfToken
-            }
-        };
-
-
-        return $http.put(restUrl.account + "/" + login + '/email', data, config).then(
-            function success(response) {
-                if (response.status == 200)
-                    emailUpdateStatus = 1;
-            },
-            function error(response) {
-                if (response.status != 403)
-                    emailUpdateStatus = -1;
-            }
-        );
-    };
-
-    $scope.putAccountPassword = function (data) {
-        var config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN' : csrfToken
-            }
-        };
-
-        return $http.put(restUrl.account + "/" + login + '/password', data, config).then(
-            function success(response) {
-                if (response.status == 200)
-                    passwordUpdateStatus = 1;
-            },
-            function error(response) {
-                if (response.status != 403)
-                    passwordUpdateStatus = -1;
-            }
-        );
-    };
-
-    $scope.removeAccount = function () {
-        var config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN' : csrfToken
-            }
-        };
-
-        return $http.delete(restUrl.account + "/" + $scope.account.login, config).then(
-            function success(response) {
-                if (response.status == 200)
-                    deleteStatus = 1;
-            },
-            function error(response) {
-                if (response.status != 403)
-                    deleteStatus = -1;
+                $window.location.href = url.errorWithMessage + 'Error ' + response.status;
             }
         );
     };
@@ -198,7 +106,7 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         if ($scope.profile == null)
             return;
 
-        $scope.putProfile($scope.profile).then(
+        ProfileService.put($scope.account.login, $scope.profile, csrfToken).then(
             function () {
                 StatusService.setStatus(statusElement.profile, true, message.success.success);
                 persistentProfile = copyTo($scope.profile, persistentProfile);
@@ -236,20 +144,16 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
             return;
         }
 
-        $scope.putAccountEmail($scope.newAccount).then(
-            function () {
-                if (emailUpdateStatus != null && emailUpdateStatus > 0) {
-                    StatusService.setStatus(statusElement.email, true, message.success.success);
-                    $scope.account.email = $scope.newAccount.email;
-                }
-
-                emailUpdateStatus = null;
+        AccountService.putEmail(login, $scope.newAccount, csrfToken).then(
+            function success() {
+                StatusService.setStatus(statusElement.email, true, message.success.success);
+                $scope.account.email = $scope.newAccount.email;
             },
-            function () {
-                StatusService.setStatus(statusElement.email, false, message.error.internalError);
-
-                emailUpdateStatus = null;
-            });
+            function error(response) {
+                StatusService.setStatus(statusElement.email, false,
+                    message.error.internalError + ': ' + response.status);
+            }
+        );
     };
 
     $scope.changePassword = function () {
@@ -257,35 +161,35 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         statusElement.delete.style.visibility = 'hidden';
 
 
-        var oldPassword = document.getElementById('inputOldPassword').value;
-        var newPassword = document.getElementById('inputNewPassword').value;
-        var confirmPassword = document.getElementById('inputConfirmPassword').value;
+        var oldPassword = document.getElementById('inputOldPassword');
+        var newPassword = document.getElementById('inputNewPassword');
+        var confirmPassword = document.getElementById('inputConfirmPassword');
 
-        var validated = $scope.validatePassword(oldPassword, newPassword, confirmPassword);
+        var validated = $scope.validatePassword(oldPassword.value, newPassword.value, confirmPassword.value);
 
         if (!validated)
             return;
 
 
-        $scope.account.password = oldPassword;
+        $scope.account.password = oldPassword.value;
 
         var newAccount = copy($scope.account);
-        newAccount.password = newPassword;
+        newAccount.password = newPassword.value;
 
 
-        $scope.putAccountPassword(newAccount).then(
-            function () {
-                if (passwordUpdateStatus != null && passwordUpdateStatus > 0)
-                    StatusService.setStatus(statusElement.password, true, message.success.success);
+        AccountService.putPassword(login, newAccount, csrfToken).then(
+            function success() {
+                StatusService.setStatus(statusElement.password, true, message.success.success);
 
-                passwordUpdateStatus = null;
-
-            //    TODO clear form
+                oldPassword.value = '';
+                newPassword.value = '';
+                confirmPassword.value = '';
             },
-            function() {
-                StatusService.setStatus(statusElement.password, false, message.error.internalError);
-                passwordUpdateStatus = null;
-            });
+            function error(response) {
+                StatusService.setStatus(statusElement.password, false,
+                    message.error.internalError + ': ' + response.status);
+            }
+        );
     };
 
     $scope.deleteAccount = function () {
@@ -293,28 +197,33 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ValidateService
         StatusService.hideStatus(statusElement.password);
 
 
-        var confirm = window.confirm("Delete account?");
+        var confirm = window.confirm('Delete account?');
 
         if (confirm) {
-            $scope.removeAccount().then(
-                function() {
-                    var config = {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN' : csrfToken
-                        }
-                    };
+            AccountService.remove(login, csrfToken).then(
+                function success(response) {
+                    if (response.status == 204)
+                        StatusService.setStatus(statusElement.delete, false, message.error.accountNotFound);
+                    else {
+                        var config = {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        };
 
-                    deleteStatus = null;
-                    $http.post(url.logout, "", config).then(
-                        function() {
-                            $window.location.href = url.login + "?delete";
-                        });
+                        // TODO replace with service
+                        $http.post(url.logout, '', config).then(
+                            function () {
+                                $window.location.href = url.login + '?delete';
+                            });
+                    }
                 },
-                function() {
-                    StatusService.setStatus(statusElement.delete, false, message.error.accountNotFound);
-                    deleteStatus = null;
-                });
+                function error(response) {
+                    StatusService.setStatus(statusElement.delete, false,
+                        message.error.internalError + ': ' + response.status);
+                }
+            );
         }
     };
 

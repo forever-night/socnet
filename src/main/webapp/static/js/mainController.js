@@ -5,13 +5,14 @@ url = {
     profile: context + '/profile',
     settings: context + '/settings',
     error: context + '/error',
+    errorWithMessage: context + '/error?errorMessage=',
     logout: context + '/logout',
     accessDenied: context + '/403'
 };
 
 restUrl = {
     profile: context + '/api/profile',
-    search: context + "/api/profile?search=",
+    search: context + '/api/profile?search=',
     account: context + '/api/account'
 };
 
@@ -81,6 +82,7 @@ app.service('SearchService', function ($http) {
    this.search = function (query) {
        var searchResult = [];
 
+       // TODO get isFollowing
        return $http.get(restUrl.search + query).then(
            function success(response) {
                if (response.status == 204 || response.data.length == 0)
@@ -100,7 +102,8 @@ app.service('SearchService', function ($http) {
 
                    searchResult.push({
                        login: item.login,
-                       profile: profile
+                       profile: profile,
+                       isFollowing: null
                    });
                });
 

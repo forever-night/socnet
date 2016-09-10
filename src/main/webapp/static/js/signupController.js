@@ -16,7 +16,7 @@ app.controller('SignupCtrl', function ($scope, $http, $window, ValidateService, 
 
         return $http.post(restUrl.account, data, config).then(
             function success() {
-                $window.location.href = url.login + "?signup";
+                $window.location.href = url.login + '?signup';
             },
             function error(response) {
                 switch (response.status) {

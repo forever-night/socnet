@@ -9,6 +9,7 @@
     <script>var login = "${currentLogin}";</script>
     <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
     <script src="<c:url value='/static/js/classes/account.js'/>"></script>
+    <script src="<c:url value="/static/js/profileController.js"/>"></script>
     <script src="<c:url value='/static/js/settingsController.js'/>"></script>
     <title>settings</title>
 </jsp:attribute>

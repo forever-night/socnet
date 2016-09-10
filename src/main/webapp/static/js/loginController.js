@@ -19,6 +19,6 @@ app.controller('LoginCtrl', function($scope, StatusService) {
     };
 
     $scope.hideStatus = function() {
-        status.style.visibility = "hidden";
+        status.style.visibility = 'hidden';
     };
 });
