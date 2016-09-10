@@ -62,8 +62,10 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService,
         $scope.profileSelected = value;
         $scope.accountSelected = !value;
 
-        tab.profile.setAttribute('class', 'active');
-        tab.account.removeAttribute('class');
+        if (value) {
+            tab.profile.setAttribute('class', 'active');
+            tab.account.removeAttribute('class');
+        }
 
         statusElement.profile.style.visibility = 'hidden';
         statusElement.email.visibility = 'hidden';
@@ -84,8 +86,10 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService,
         $scope.accountSelected = value;
         $scope.profileSelected = !value;
 
-        tab.account.setAttribute('class', 'active');
-        tab.profile.removeAttribute('class');
+        if (value) {
+            tab.account.setAttribute('class', 'active');
+            tab.profile.removeAttribute('class');
+        }
 
         statusElement.profile.style.visibility = 'hidden';
         statusElement.email.style.visibility = 'hidden';

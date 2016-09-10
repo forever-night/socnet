@@ -1,7 +1,5 @@
 package socnet.controllers.rest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,7 +84,6 @@ public class ProfileRestController {
         if (login == null || login.isEmpty())
             throw new EmptyRequestException();
         
-        
         String currentLogin = userService.getCurrentLogin();
     
         if (currentLogin == null)
@@ -94,6 +91,20 @@ public class ProfileRestController {
         
         
         return profileService.findFollowersWithLogin(login);
+    }
+    
+    @RequestMapping(path = "/{login}/following", method = RequestMethod.GET)
+    public List<ProfileDto> getFollowingByLogin(@PathVariable String login) throws EmptyRequestException {
+        if (login == null || login.isEmpty())
+            throw new EmptyRequestException();
+    
+        String currentLogin = userService.getCurrentLogin();
+    
+        if (currentLogin == null)
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
+    
+    
+        return profileService.findFollowingWithLogin(login);
     }
 
     @RequestMapping(path = "/{login}", method = RequestMethod.PUT)

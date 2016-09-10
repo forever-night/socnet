@@ -18,23 +18,42 @@
     <t:owner></t:owner>
     <div ng-controller="FollowersCtrl">
         <div class="col-sm-6" style="margin-top:50px;">
+            <ul class="nav nav-tabs">
+                <li id="tabFollowers" role="presentation"
+                    ng-click="setFollowersSelected(true)"><a href="#">Followers</a></li>
+                <li id="tabFollowing" role="presentation"
+                    ng-click="setFollowingSelected(true)"><a href="#">Following</a></li>
+            </ul>
             <div id="status" class="alert" role="alert" style="visibility: hidden; margin-top:20px;"></div>
-            <div><h3>{{profileLogin}}'s followers</h3></div>
             <div style="margin-top:50px;">
-                <div class="panel panel-primary" ng-repeat="follower in followers">
-                <div class="panel-body">
-                    <div class="pull-right">
-                        <button type="button" class="btn btn-primary" ng-show="follower.login != currentLogin">
-                            <span class="glyphicon glyphicon-envelope"></span>
-                        </button>
+                <div ng-show="followersSelected" class="panel panel-primary" ng-repeat="follower in followers">
+                    <div class="panel-body">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary" ng-show="follower.login != currentLogin">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                            </button>
+                        </div>
+                        <div class="col-sm-8"><span class="glyphicon glyphicon-user"></span>
+                            <a href="${pageContext.request.contextPath}/profile/{{follower.login}}">
+                                <b>{{follower.login}}</b></a>
+                        </div>
+                        <div class="col-sm-8">{{follower.profile.name}}</div>
                     </div>
-                    <div class="col-sm-8"><span class="glyphicon glyphicon-user"></span>
-                        <a href="${pageContext.request.contextPath}/profile/{{follower.login}}">
-                            <b>{{follower.login}}</b></a>
+                </div>
+                <div ng-show="followingSelected" class="panel panel-primary" ng-repeat="profile in following">
+                    <div class="panel-body">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-primary" ng-show="profile.login != currentLogin">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                            </button>
+                        </div>
+                        <div class="col-sm-8"><span class="glyphicon glyphicon-user"></span>
+                            <a href="${pageContext.request.contextPath}/profile/{{profile.login}}">
+                                <b>{{profile.login}}</b></a>
+                        </div>
+                        <div class="col-sm-8">{{profile.profile.name}}</div>
                     </div>
-                    <div class="col-sm-8">{{follower.profile.name}}</div>
-                </div>
-                </div>
+                 </div>
             </div>
         </div>
     </div>

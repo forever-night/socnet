@@ -19,7 +19,10 @@ import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 
 import javax.persistence.NoResultException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -123,6 +126,36 @@ public class ProfileRestControllerTest {
         
         
         mockMvc.perform(get("/api/profile/test/followers"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json));
+    }
+    
+    @Test
+    public void getFollowingByLoginExists() throws Exception {
+        int resultSize = 3;
+        List<ProfileDto> result = new ArrayList<>();
+    
+        for (int i = 0; i < resultSize; i++) {
+            Account account = generateAccount("a" + i);
+            Profile profile = generateProfile(account);
+            ProfileDto profileDto = generateProfileDto(profile);
+        
+            result.add(profileDto);
+        }
+    
+        String json = toJson(result, jackson2HttpMessageConverter());
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn("aaa");
+    
+        when(profileServiceMock.findFollowingWithLogin(any(String.class)))
+                .thenReturn(result);
+    
+        when(profileMapperMock.asProfileDto(any()))
+                .thenReturn(generateProfileDto());
+    
+    
+        mockMvc.perform(get("/api/profile/test/following"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().string(json));
     }

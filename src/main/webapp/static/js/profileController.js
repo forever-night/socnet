@@ -141,6 +141,39 @@ app.service('ProfileService', function($http, $window) {
         );
     };
 
+    this.getFollowing = function(login) {
+        var following = [];
+
+        return $http.get(restUrl.profile + '/' + login + '/following').then(
+            function success(response) {
+                if (response.status == 204)
+                    $window.location.href = url.errorWithMessage + message.error.profileNotFound;
+                else if (response.data.length == 0)
+                    return following;
+
+                var data = response.data;
+
+                data.forEach(function(item, i, data){
+                    var profile = new Profile(
+                        item.name,
+                        item.dateOfBirth,
+                        item.phone,
+                        item.country,
+                        item.city,
+                        item.info
+                    );
+
+                    following.push({
+                        login: item.login,
+                        profile: profile
+                    });
+                });
+
+                return following;
+            }
+        );
+    };
+
     this.isFollowing = function(toFollow) {
 
     };
