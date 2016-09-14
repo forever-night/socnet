@@ -10,7 +10,7 @@ app.controller('SearchResultCtrl', function($scope, SearchService, StatusService
     var csrfToken = document.getElementsByName('_csrf')[0].content;
 
 
-    $scope.search = function(query) {
+    $scope.search = function (query) {
         StatusService.hideStatus(status);
 
         if ($scope.searchQuery.length == 0 || $scope.searchQuery == '')
@@ -39,16 +39,22 @@ app.controller('SearchResultCtrl', function($scope, SearchService, StatusService
         );
     };
 
-    $scope.follow = function (toFollow, searchResultIndex) {
-        return ProfileService.follow(toFollow, csrfToken).then(
+    $scope.follow = function (profileToFollow) {
+        return ProfileService.follow(profileToFollow.login, true, csrfToken).then(
             function success(response) {
-                if (response == 200) {
-                    console.log('following');
-                    $scope.searchResult[searchResultIndex].isFollowing = true;
-                //    TODO display 'unfollow' button
-                }
+                if (response == 200)
+                    profileToFollow.profile.isFollowing = true;
             }
         )
+    };
+
+    $scope.unfollow = function (profileToUnfollow) {
+        return ProfileService.follow(profileToUnfollow.login, false, csrfToken).then(
+            function success(response) {
+                if (response == 200)
+                    profileToUnfollow.profile.isFollowing = false;
+            }
+        );
     };
 
 

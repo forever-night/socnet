@@ -7,6 +7,7 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
     $scope.profileLogin = $scope.currentLogin;
 
     var statusElement = document.getElementById('status');
+    var csrfToken = document.getElementsByName('_csrf')[0].content;
 
     var followers = [],
         following = [];
@@ -17,7 +18,7 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
     };
 
 
-    $scope.getFollowers = function(login) {
+    $scope.getFollowers = function (login) {
         ProfileService.getFollowers(login).then(
             function success(response) {
                 if (response.length == 0)
@@ -41,7 +42,7 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
         );
     };
 
-    $scope.getFollowing = function(login) {
+    $scope.getFollowing = function (login) {
         ProfileService.getFollowing(login).then(
             function success(response) {
                 if (response.length == 0)
@@ -65,6 +66,34 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
         );
     };
 
+    $scope.follow = function (profileToFollow) {
+        ProfileService.follow(profileToFollow.login, true, csrfToken).then(
+            function success(response) {
+                if (response == 200) {
+                    if ($scope.followers != null && $scope.followers.length > 0)
+                        setIsFollowing($scope.followers, profileToFollow, true);
+
+                    if ($scope.following != null)
+                    setIsFollowing($scope.following, profileToFollow, true);
+                }
+            }
+        );
+    };
+
+    $scope.unfollow = function (profileToUnfollow) {
+        ProfileService.follow(profileToUnfollow.login, false, csrfToken).then(
+            function success(response) {
+                if (response == 200) {
+                    if ($scope.followers != null && $scope.followers.length > 0)
+                        setIsFollowing($scope.followers, profileToUnfollow, false);
+
+                    if ($scope.following != null)
+                        setIsFollowing($scope.following, profileToUnfollow, false);
+                }
+            }
+        );
+    };
+
     $scope.setFollowersSelected = function (value){
         $scope.followersSelected = value;
         $scope.followingSelected = !value;
@@ -81,7 +110,7 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
         }
     };
 
-    $scope.setFollowingSelected = function(value) {
+    $scope.setFollowingSelected = function (value) {
         $scope.followingSelected = value;
         $scope.followersSelected = !value;
 
@@ -104,3 +133,11 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
 
     $scope.setFollowersSelected(true);
 });
+
+
+function setIsFollowing(array, profile, value) {
+    array.forEach(function(item, i, array){
+       if (item.login == profile.login)
+           item.profile.isFollowing = value;
+    });
+}

@@ -40,8 +40,10 @@
             <div class="pull-left col-md-4 col-sm-6" style="margin-top:1em">
                 <c:if test="${profileLogin != null && profileLogin != currentLogin}">
                     <ul class="nav nav-pills nav-stacked">
-                        <button ng-click="follow(profileLogin)"
+                        <button ng-click="follow(profileLogin)" ng-if="!isFollowing"
                            class="btn btn-sm btn-default col-sm-12 text-left">Follow</button>
+                        <button ng-click="unfollow(profileLogin)" ng-if="isFollowing"
+                            class="btn btn-sm btn-default col-sm-12 text-left">Unfollow</button>
                         <button class="btn btn-sm btn-primary col-sm-12">Private Message</button>
                     </ul>
                 </c:if>

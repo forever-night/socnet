@@ -83,7 +83,6 @@ app.service('SearchService', function ($http) {
    this.search = function (query) {
        var searchResult = [];
 
-       // TODO get isFollowing
        return $http.get(restUrl.search + query).then(
            function success(response) {
                if (response.status == 204 || response.data.length == 0)
@@ -101,10 +100,12 @@ app.service('SearchService', function ($http) {
                        item.info
                    );
 
+                   if (item.following !== 'undefined')
+                       profile.isFollowing = item.following;
+
                    searchResult.push({
                        login: item.login,
-                       profile: profile,
-                       isFollowing: null
+                       profile: profile
                    });
                });
 

@@ -1,18 +1,20 @@
 app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
     $scope.profile = null;
     $scope.profileLogin = null;
+    $scope.isFollowing = null;
 
     var csrfToken = document.getElementsByName('_csrf')[0].content;
-    var isFollowing;
 
 
-    $scope.getProfile = function(login) {
+    $scope.getProfile = function (login) {
         return ProfileService.get(login).then(
             function success(response) {
                 if (response == null)
                     $window.location.href = url.errorWithMessage + message.error.profileNotFound;
-                else
+                else {
                     $scope.profile = response;
+                    $scope.isFollowing = $scope.profile.isFollowing;
+                }
             },
             function error(response) {
                 $window.location.href = url.errorWithMessage + 'Error ' + response.status;
@@ -20,13 +22,20 @@ app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
         );
     };
 
-    $scope.follow = function(toFollow) {
-        return ProfileService.follow(toFollow, csrfToken).then(
+    $scope.follow = function (toFollow) {
+        return ProfileService.follow(toFollow, true, csrfToken).then(
+            function success (response) {
+                if (response == 200)
+                    $scope.isFollowing = true;
+            }
+        );
+    };
+
+    $scope.unfollow = function( toUnfollow) {
+        return ProfileService.follow(toUnfollow, false, csrfToken).then(
             function success(response) {
-                if (response == 200) {
-                    isFollowing = true;
-                    //TODO display 'unfollow' button
-                }
+                if (response == 200)
+                    $scope.isFollowing = false;
             }
         );
     };
@@ -42,7 +51,7 @@ app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
 });
 
 
-app.service('ProfileService', function($http, $window) {
+app.service('ProfileService', function ($http, $window) {
     this.get = function(login) {
         var profile = null;
 
@@ -53,7 +62,7 @@ app.service('ProfileService', function($http, $window) {
 
                 var data = response.data;
 
-                if (data != null)
+                if (data != null) {
                     profile = new Profile(
                         data.name,
                         data.dateOfBirth,
@@ -62,6 +71,10 @@ app.service('ProfileService', function($http, $window) {
                         data.city,
                         data.info
                     );
+
+                    if (data.following !== 'undefined')
+                        profile.isFollowing = data.following;
+                }
 
                 return profile;
             }
@@ -79,7 +92,11 @@ app.service('ProfileService', function($http, $window) {
         return $http.put(restUrl.profile + '/' + login, profile, config);
     };
 
-    this.follow = function(toFollow, csrfToken) {
+    /**
+     * @param {Profile} otherProfile - login of profile to (un)follow
+     * @param {boolean} isFollow - true if follow, false if unfollow
+     * */
+    this.follow = function (otherProfile, isFollow, csrfToken) {
         var config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +104,9 @@ app.service('ProfileService', function($http, $window) {
             }
         };
 
-        return $http.put(restUrl.profile + '/' + toFollow + '?follow', '', config).then(
+        var requestParam = isFollow ? '?follow' : '?unfollow';
+
+        return $http.put(restUrl.profile + '/' + otherProfile + requestParam, '', config).then(
             function success(response) {
                 console.log(response);
                 switch (response.status) {
@@ -108,7 +127,7 @@ app.service('ProfileService', function($http, $window) {
         );
     };
 
-    this.getFollowers = function(login) {
+    this.getFollowers = function (login) {
         var followers = [];
 
         return $http.get(restUrl.profile + '/' + login + '/followers').then(
@@ -130,6 +149,9 @@ app.service('ProfileService', function($http, $window) {
                         item.info
                     );
 
+                    if (item.following !== 'undefined')
+                        profile.isFollowing = item.following;
+
                     followers.push({
                         login: item.login,
                         profile: profile
@@ -141,7 +163,7 @@ app.service('ProfileService', function($http, $window) {
         );
     };
 
-    this.getFollowing = function(login) {
+    this.getFollowing = function (login) {
         var following = [];
 
         return $http.get(restUrl.profile + '/' + login + '/following').then(
@@ -163,6 +185,9 @@ app.service('ProfileService', function($http, $window) {
                         item.info
                     );
 
+                    if (item.following !== 'undefined')
+                        profile.isFollowing = item.following;
+
                     following.push({
                         login: item.login,
                         profile: profile
@@ -173,13 +198,9 @@ app.service('ProfileService', function($http, $window) {
             }
         );
     };
-
-    this.isFollowing = function(toFollow) {
-
-    };
 });
 
-app.service('AccountService', function($http) {
+app.service('AccountService', function ($http) {
     this.get = function(login) {
         var account = null;
 
@@ -200,7 +221,7 @@ app.service('AccountService', function($http) {
         );
     };
 
-    this.putEmail = function(login, account, csrfToken) {
+    this.putEmail = function (login, account, csrfToken) {
         var config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -211,7 +232,7 @@ app.service('AccountService', function($http) {
         return $http.put(restUrl.account + '/' + login + '/email', account, config);
     };
 
-    this.putPassword = function(login, account, csrfToken) {
+    this.putPassword = function (login, account, csrfToken) {
         var config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -222,7 +243,7 @@ app.service('AccountService', function($http) {
         return $http.put(restUrl.account + '/' + login + '/password', account, config);
     };
 
-    this.remove = function(login, csrfToken) {
+    this.remove = function (login, csrfToken) {
         var config = {
             headers: {
                 'Content-Type': 'application/json',

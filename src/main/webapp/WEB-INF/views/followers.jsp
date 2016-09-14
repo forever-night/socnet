@@ -4,6 +4,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <t:template>
 <jsp:attribute name="head">
+    <sec:csrfMetaTags/>
     <sec:authentication property="principal.username" var="currentLogin"/>
     <c:if test="${profileLogin != null}">
         <script>var ownerLogin = "${profileLogin}";</script>
@@ -25,13 +26,16 @@
                     ng-click="setFollowingSelected(true)"><a href="#">Following</a></li>
             </ul>
             <div id="status" class="alert" role="alert" style="visibility: hidden; margin-top:20px;"></div>
-            <div style="margin-top:50px;">
+            <div style="margin-top:10px;">
                 <div ng-show="followersSelected" class="panel panel-primary" ng-repeat="follower in followers">
                     <div class="panel-body">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary" ng-show="follower.login != currentLogin">
-                                <span class="glyphicon glyphicon-envelope"></span>
-                            </button>
+                        <div class="pull-right" ng-if="currentLogin != follower.login">
+                            <button type="button" class="btn btn-default" ng-if="!follower.profile.isFollowing"
+                                    ng-click="follow(follower)">Follow</button>
+                            <button type="button" class="btn btn-default" ng-if="follower.profile.isFollowing"
+                                    ng-click="unfollow(follower)">Unfollow</button>
+                            <button type="button" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-envelope"></span></button>
                         </div>
                         <div class="col-sm-8"><span class="glyphicon glyphicon-user"></span>
                             <a href="${pageContext.request.contextPath}/profile/{{follower.login}}">
@@ -42,10 +46,13 @@
                 </div>
                 <div ng-show="followingSelected" class="panel panel-primary" ng-repeat="profile in following">
                     <div class="panel-body">
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary" ng-show="profile.login != currentLogin">
-                                <span class="glyphicon glyphicon-envelope"></span>
-                            </button>
+                        <div class="pull-right" ng-if="currentLogin != profile.login">
+                            <button type="button" class="btn btn-default" ng-if="!profile.profile.isFollowing"
+                                    ng-click="follow(profile)">Follow</button>
+                            <button type="button" class="btn btn-default" ng-if="profile.profile.isFollowing"
+                                    ng-click="unfollow(profile)">Unfollow</button>
+                            <button type="button" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-envelope"></span></button>
                         </div>
                         <div class="col-sm-8"><span class="glyphicon glyphicon-user"></span>
                             <a href="${pageContext.request.contextPath}/profile/{{profile.login}}">

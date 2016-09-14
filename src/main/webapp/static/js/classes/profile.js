@@ -5,6 +5,7 @@ function Profile() {
     this.country = "";
     this.city = "";
     this.info = "";
+    this.isFollowing = false;
 }
 
 function Profile(name, dateOfBirth, phone, country, city, info) {
@@ -14,6 +15,17 @@ function Profile(name, dateOfBirth, phone, country, city, info) {
     this.country = country;
     this.city = city;
     this.info = info;
+    this.isFollowing = false;
+}
+
+function Profile(name, dateOfBirth, phone, country, city, info, isFollowing) {
+    this.name = name;
+    this.dateOfBirth = dateOfBirth;
+    this.phone = phone;
+    this.country = country;
+    this.city = city;
+    this.info = info;
+    this.isFollowing = isFollowing;
 }
 
 function copy(profile) {
@@ -40,6 +52,7 @@ function copyTo(profileFrom, profileTo) {
     profileTo.country = profileFrom.country;
     profileTo.city = profileFrom.city;
     profileTo.info = profileFrom.info;
+    profileTo.isFollowing = profileFrom.isFollowing;
     
     return profileTo;
 }
