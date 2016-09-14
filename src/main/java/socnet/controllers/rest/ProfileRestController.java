@@ -13,10 +13,8 @@ import socnet.services.interfaces.ProfileService;
 import socnet.services.interfaces.UserService;
 import socnet.util.Global;
 
-import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -52,29 +50,16 @@ public class ProfileRestController {
     
     @RequestMapping(path = "/{login}", method = RequestMethod.GET)
     public ProfileDto getProfileByLogin(@PathVariable String login) {
-        return profileMapper.asProfileDto(profileService.findByLogin(login));
+        return profileService.findDtoByLogin(login);
     }
     
     @RequestMapping(params = "search", method = RequestMethod.GET)
-    public List<ProfileDto> getProfilesLikeLogin(@RequestParam(name = "search") String login)
+    public List<ProfileDto> getProfilesLike(@RequestParam(name = "search") String searchPattern)
             throws EmptyRequestException {
-        if (login.isEmpty())
+        if (searchPattern.isEmpty())
             throw new EmptyRequestException();
         
-        Map<String, Profile> entityMap = profileService.findAllLikeLogin(login);
-        
-        if (entityMap == null || entityMap.isEmpty())
-            throw new NoResultException();
-        
-        
-        List<ProfileDto> dtoList = new ArrayList<>();
-        ProfileDto temp;
-        
-        for (Map.Entry<String, Profile> entry : entityMap.entrySet()) {
-            temp = profileMapper.asProfileDto(entry.getValue());
-            temp.setLogin(entry.getKey());
-            dtoList.add(temp);
-        }
+        List<ProfileDto> dtoList = profileService.findAllLike(searchPattern);
         
         return dtoList;
     }
@@ -127,7 +112,7 @@ public class ProfileRestController {
     }
     
     @RequestMapping(path = "/{loginToFollow}", params = "follow", method = RequestMethod.PUT)
-    public ResponseEntity follow(@PathVariable() String loginToFollow) {
+    public ResponseEntity follow(@PathVariable String loginToFollow) {
         String currentLogin = userService.getCurrentLogin();
         
         if (currentLogin == null)
@@ -138,6 +123,21 @@ public class ProfileRestController {
         
         profileService.addFollower(toFollow, follower);
         
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{loginToUnfollow}", params = "unfollow", method = RequestMethod.PUT)
+    public ResponseEntity unfollow(@PathVariable String loginToUnfollow) {
+        String currentLogin = userService.getCurrentLogin();
+    
+        if (currentLogin == null)
+            throw new AccessDeniedException(Global.Error.ACCESS_DENIED.getMessage());
+    
+        Profile toFollow = profileService.findByLogin(loginToUnfollow);
+        Profile follower = profileService.findByLogin(currentLogin);
+    
+        profileService.removeFollower(toFollow, follower);
+    
         return new ResponseEntity(HttpStatus.OK);
     }
 }

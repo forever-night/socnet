@@ -38,14 +38,14 @@ public class ProfileDaoImpl implements ProfileDao{
     
     @Override
     @Transactional
-    public Map<String, Profile> findAllLikeLogin(String login) {
-        Query query = em.createQuery("select new map(a.login as login, " +
+    public Map<String, Profile> findAllLike(String searchPattern) {
+        Query query = em.createQuery("select new map(a.login as login, p.id as id, " +
                 "p.name as name, p.country as country, p.phone as phone, p.info as info, p.currentCity as city, " +
                 "p.dateOfBirth as dateOfBirth) " +
                 "from Profile as p, Account as a " +
                 "where p.id = a.id " +
                 "and (a.login like lower(:login) or p.name like lower(:login))");
-        query.setParameter("login", "%" + login + "%");
+        query.setParameter("login", "%" + searchPattern + "%");
         
         List<Map<String, Object>> queryResultList = query.getResultList();
         
@@ -53,6 +53,35 @@ public class ProfileDaoImpl implements ProfileDao{
             return null;
         else
             return mapResultListAsLoginProfileMap(queryResultList);
+    }
+    
+    @Override
+    public boolean checkIfFollows(Profile owner, Profile follower) {
+        Query query = em.createQuery("select count(f) from Profile p join p.followers f " +
+                "where p.id = :ownerId and f.id = :followerId");
+        
+        query.setParameter("ownerId", owner.getId());
+        query.setParameter("followerId", follower.getId());
+        
+        Long count = (Long) query.getSingleResult();
+        
+        return count > 0;
+    }
+    
+    @Override
+    public List<Integer> pickFollowed(Profile profile, Integer[] followingIds) {
+        Query query = em.createQuery("select p.id from Profile p join p.followers f " +
+                "where f.id = :id and p.id in :followingIds");
+        
+        query.setParameter("id", profile.getId());
+        query.setParameter("followingIds", Arrays.asList(followingIds));
+        
+        List<Integer> queryResultList = query.getResultList();
+        
+        if (queryResultList == null || queryResultList.isEmpty())
+            return null;
+        else
+            return new ArrayList<>(queryResultList);
     }
     
     @Override
@@ -68,12 +97,6 @@ public class ProfileDaoImpl implements ProfileDao{
     }
     
     @Override
-    public Set<Profile> findFollowers(String login) {
-        Profile profile = findByLogin(login);
-        return findFollowers(profile);
-    }
-    
-    @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public Map<String, Profile> findFollowersWithLogin(Profile profile) {
@@ -82,28 +105,19 @@ public class ProfileDaoImpl implements ProfileDao{
         if (persisted == null)
             throw new NoResultException();
         
-        Query query = em.createQuery("select new map(a.login as login, " +
+        Query query = em.createQuery("select new map(a.login as login, f.id as id, " +
                 "f.name as name, f.country as country, f.phone as phone, f.info as info, f.currentCity as city, " +
                 "f.dateOfBirth as dateOfBirth) " +
                 "from Profile p join p.followers f, Account a " +
                 "where f.id = a.id and p.id = :id");
         
         query.setParameter("id", persisted.getId());
-    
         List<Map<String, Object>> queryResultList = query.getResultList();
-    
-    
+        
         if (queryResultList == null || queryResultList.isEmpty())
             return null;
         else
             return mapResultListAsLoginProfileMap(queryResultList);
-    }
-    
-    @Override
-    @Transactional
-    public Map<String, Profile> findFollowersWithLogin(String login) {
-        Profile p = findByLogin(login);
-        return findFollowersWithLogin(p);
     }
     
     @Override
@@ -124,13 +138,6 @@ public class ProfileDaoImpl implements ProfileDao{
     
     @Override
     @Transactional
-    public Set<Profile> findFollowing(String login) {
-        Profile p = findByLogin(login);
-        return findFollowing(p);
-    }
-    
-    @Override
-    @Transactional
     @SuppressWarnings("unchecked")
     public Map<String, Profile> findFollowingWithLogin(Profile profile) {
         Profile persisted = em.find(Profile.class, profile.getId());
@@ -138,7 +145,7 @@ public class ProfileDaoImpl implements ProfileDao{
         if (persisted == null)
             throw new NoResultException();
         
-        Query query = em.createQuery("select new map(a.login as login, " +
+        Query query = em.createQuery("select new map(a.login as login, p.id as id, " +
                 "p.name as name, p.country as country, p.phone as phone, p.info as info, p.currentCity as city, " +
                 "p.dateOfBirth as dateOfBirth) " +
                 "from Profile p join p.followers f, Account a " +
@@ -151,12 +158,6 @@ public class ProfileDaoImpl implements ProfileDao{
             return null;
         else
             return mapResultListAsLoginProfileMap(queryResultList);
-    }
-    
-    @Override
-    public Map<String, Profile> findFollowingWithLogin(String login) {
-        Profile profile = findByLogin(login);
-        return findFollowingWithLogin(profile);
     }
     
     @Override
@@ -258,6 +259,12 @@ public class ProfileDaoImpl implements ProfileDao{
             String resultLogin = (String) map.get("login");
         
             Profile profile = new Profile();
+            
+            Integer id = (Integer) map.get("id");
+            
+            if (id != null)
+                profile.setId(id);
+            
             profile.setName((String) map.get("name"));
             profile.setCountry((String) map.get("country"));
             profile.setPhone((String) map.get("phone"));

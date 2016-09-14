@@ -48,7 +48,7 @@ public class ProfileDaoImplTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void persistNull() {
-        Integer actualId = profileDao.persist(null);
+        profileDao.persist(null);
     }
     
     @Test
@@ -86,11 +86,11 @@ public class ProfileDaoImplTest {
     
     @Test(expected = NoResultException.class)
     public void findByLoginIfNotExists() {
-        Profile actual = profileDao.findByLogin("testtest");
+        profileDao.findByLogin("testtest");
     }
     
     @Test
-    public void findAllLikeLoginIfExists() {
+    public void findAllLikeIfExists() {
         String searchPattern = "testTEST";
         int iterations = 3;
         
@@ -116,7 +116,7 @@ public class ProfileDaoImplTest {
         profileDao.persist(p);
         
         
-        Map<String, Profile> actual = profileDao.findAllLikeLogin(searchPattern.toUpperCase());
+        Map<String, Profile> actual = profileDao.findAllLike(searchPattern.toUpperCase());
             
         assertNotNull(actual);
         assertTrue(actual.size() > 0);
@@ -129,7 +129,118 @@ public class ProfileDaoImplTest {
             assertEquals(expectedProfiles.get(i), actual.get(expectedAccounts.get(i).getLogin()));
         }
     }
+    
+    @Test
+    public void checkIfFollowsTrue() {
+        Account accountOwner = generateAccount("owner");
+        Account accountFollower = generateAccount("follower");
+        accountDao.persist(accountOwner);
+        accountDao.persist(accountFollower);
         
+        Profile profileFollower = generateProfile(accountFollower);
+        profileDao.persist(profileFollower);
+        
+        Profile profileOwner = generateProfile(accountOwner);
+        
+        Set<Profile> followers = new HashSet<>();
+        followers.add(profileFollower);
+        
+        profileOwner.setFollowers(followers);
+        profileDao.persist(profileOwner);
+        
+        boolean actual = profileDao.checkIfFollows(profileOwner, profileFollower);
+        
+        assertTrue(actual);
+    }
+    
+    @Test
+    public void checkIfFollowsFalse() {
+        Account account1 = generateAccount("a1");
+        Account account2 = generateAccount("a2");
+        accountDao.persist(account1);
+        accountDao.persist(account2);
+        
+        Profile profile1 = generateProfile(account1);
+        Profile profile2 = generateProfile(account2);
+        profileDao.persist(profile1);
+        profileDao.persist(profile2);
+        
+        boolean actual = profileDao.checkIfFollows(profile1, profile2);
+        
+        assertFalse(actual);
+    }
+    
+    @Test
+    public void checkWhoIsFollowedResult2Rows() {
+        int iterations = 5;
+        int expectedNumberOfRows = 2;
+        
+        Account mainAccount = generateAccount("main");
+        accountDao.persist(mainAccount);
+        
+        Profile mainProfile = generateProfile(mainAccount);
+        profileDao.persist(mainProfile);
+        
+        
+        List<Profile> otherProfiles = new ArrayList<>();
+        List<Integer> expectedIds = new ArrayList<>();
+        
+        for (int i = 0; i < iterations; i++) {
+            Account a = generateAccount("a" + i);
+            accountDao.persist(a);
+            
+            Profile p = generateProfile(a);
+            
+            if (i < expectedNumberOfRows) {
+                Set<Profile> followers = new HashSet<>();
+                followers.add(mainProfile);
+                p.setFollowers(followers);
+                
+                expectedIds.add(p.getId());
+            }
+            
+            profileDao.persist(p);
+            otherProfiles.add(p);
+        }
+        
+        
+        List<Integer> actual = profileDao.pickFollowed(mainProfile, expectedIds.toArray(new Integer[]{}));
+        
+        assertNotNull(actual);
+        assertEquals(expectedIds.size(), actual.size());
+        assertTrue(actual.containsAll(expectedIds));
+    }
+    
+    @Test
+    public void checkWhoIsFollowedNoResult() {
+        int iterations = 5;
+    
+        Account mainAccount = generateAccount("main");
+        accountDao.persist(mainAccount);
+    
+        Profile mainProfile = generateProfile(mainAccount);
+        profileDao.persist(mainProfile);
+    
+    
+        List<Profile> otherProfiles = new ArrayList<>();
+        List<Integer> expectedIds = new ArrayList<>();
+    
+        for (int i = 0; i < iterations; i++) {
+            Account a = generateAccount("a" + i);
+            accountDao.persist(a);
+        
+            Profile p = generateProfile(a);
+        
+            profileDao.persist(p);
+            otherProfiles.add(p);
+        }
+    
+    
+        List<Integer> actual = profileDao.pickFollowed(mainProfile, expectedIds.toArray(new Integer[]{}));
+    
+        assertNull(actual);
+    }
+    
     @Test
     public void findFollowersIfExists() {
         int iterations = 5;

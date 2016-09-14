@@ -20,9 +20,7 @@ import socnet.services.interfaces.UserService;
 
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -70,18 +68,21 @@ public class ProfileRestControllerTest {
     @Test
     public void getProfilesLikeLoginNotNull() throws Exception {
         String searchPattern = "test";
-        Map<String, Profile> profileMap = new HashMap<>();
+        List<ProfileDto> dtoList = new ArrayList<>();
 
         Profile tempProfile;
         
         for (int i = 0; i < 2; i++) {
             tempProfile = generateProfile();
-            profileMap.put(i + searchPattern + i, tempProfile);
+            ProfileDto dto = generateProfileDto(tempProfile);
+            dto.setLogin(i + searchPattern + i);
+            
+            dtoList.add(dto);
         }
         
 
-        when(profileServiceMock.findAllLikeLogin(searchPattern))
-                .thenReturn(profileMap);
+        when(profileServiceMock.findAllLike(searchPattern))
+                .thenReturn(dtoList);
 
         when(profileMapperMock.asProfileDto(any()))
                 .thenReturn(generateProfileDto());
@@ -219,8 +220,6 @@ public class ProfileRestControllerTest {
     public void followNotLoggedIn() throws Exception {
         String toFollow = "bbb";
     
-        Profile profile = generateProfile();
-    
         when(userServiceMock.getCurrentLogin())
                 .thenReturn(null);
         
@@ -234,8 +233,6 @@ public class ProfileRestControllerTest {
         String currentLogin = "aaa";
         String toFollow = "bbb";
     
-        Profile profile = generateProfile();
-    
         when(userServiceMock.getCurrentLogin())
                 .thenReturn(currentLogin);
     
@@ -244,6 +241,55 @@ public class ProfileRestControllerTest {
     
         mockMvc.perform(put("/api/profile/" + toFollow)
                 .param("follow", ""))
+                .andReturn();
+    }
+    
+    @Test
+    public void unfollowNotNull() throws Exception {
+        String currentLogin = "aaa";
+        String toUnfollow = "bbb";
+    
+        Profile profile = generateProfile();
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(currentLogin);
+    
+        when(profileServiceMock.findByLogin(any()))
+                .thenReturn(profile);
+    
+        when(profileServiceMock.removeFollower(any(), any()))
+                .thenReturn(profile);
+    
+        mockMvc.perform(put("/api/profile/" + toUnfollow)
+                .param("unfollow", ""))
+                .andExpect(status().isOk());
+    }
+    
+    @Test(expected = NestedServletException.class)
+    public void unfollowNotLoggedIn() throws Exception {
+        String toUnfollow = "bbb";
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(null);
+    
+        mockMvc.perform(put("/api/profile/" + toUnfollow)
+                .param("unfollow", ""))
+                .andReturn();
+    }
+    
+    @Test(expected = NestedServletException.class)
+    public void unfollowLoginNotFound() throws Exception {
+        String currentLogin = "aaa";
+        String toUnfollow = "bbb";
+    
+        when(userServiceMock.getCurrentLogin())
+                .thenReturn(currentLogin);
+    
+        when(profileServiceMock.findByLogin(toUnfollow))
+                .thenThrow(NoResultException.class);
+    
+        mockMvc.perform(put("/api/profile/" + toUnfollow)
+                .param("unfollow", ""))
                 .andReturn();
     }
 }

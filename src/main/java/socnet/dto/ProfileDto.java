@@ -13,6 +13,7 @@ public class ProfileDto implements Serializable {
     private String info;
     private Date dateOfBirth;
     private String login;
+    private Boolean isFollowing = Boolean.FALSE;
     
     public String getName() {
         return name;
@@ -68,6 +69,14 @@ public class ProfileDto implements Serializable {
     
     public void setLogin(String login) {
         this.login = login;
+    }
+    
+    public boolean isFollowing() {
+        return isFollowing;
+    }
+    
+    public void setFollowing(boolean following) {
+        isFollowing = following;
     }
     
     @Override
