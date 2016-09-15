@@ -501,8 +501,8 @@ public class ProfileDaoImplTest {
         assertTrue(actual.getFollowers().contains(profile2));
     }
     
-//    @Test
-    public void remove() {
+    @Test
+    public void removeIfHasNoFollowersOrFollowing() {
         Account account = generateAccount("testtest");
         accountDao.persist(account);
         
@@ -517,67 +517,123 @@ public class ProfileDaoImplTest {
         assertNull(actual);
     }
     
-//    @Test
-    public void removeIfProfileIsFollower() {
-        Account a1 = generateAccount("a1");
-        Account a2 = generateAccount("a2");
-        Account a3 = generateAccount("a3");
-        accountDao.persist(a1);
-        accountDao.persist(a2);
-        accountDao.persist(a3);
+    @Test(expected = NoResultException.class)
+    public void removeIfHasFollowers() {
+        int followerCount = 3;
         
-        Profile p1 = generateProfile(a1);
-        Profile p2 = generateProfile(a2);
-        Profile p3 = generateProfile(a3);
-        profileDao.persist(p1);
-        profileDao.persist(p2);
+        Account mainAccount = generateAccount("main");
+        accountDao.persist(mainAccount);
         
-        p3.setFollowers(new HashSet<>(Arrays.asList(p1, p2)));
-        profileDao.persist(p3);
-        
-        Set<Profile> beforeDelete = profileDao.findFollowers(p3);
-        
-        assertTrue(beforeDelete.contains(p1));
-        
-        
-        profileDao.remove(p1);
-        Set<Profile> afterDelete = profileDao.findFollowers(p3);
-        
-        assertNotNull(afterDelete);
-        assertFalse(afterDelete.contains(p1));
-        assertTrue(afterDelete.contains(p2));
-    }
+        Profile mainProfile = generateProfile(mainAccount);
+        Set<Profile> followers = new HashSet<>();
     
-//    @Test
-    public void removeIfProfileHasFollower() {
-        Account a1 = generateAccount("a1");
-        Account a2 = generateAccount("a2");
-        Account a3 = generateAccount("a3");
-        accountDao.persist(a1);
-        accountDao.persist(a2);
-        accountDao.persist(a3);
-    
-        Profile p1 = generateProfile(a1);
-        Profile p2 = generateProfile(a2);
-        Profile p3 = generateProfile(a3);
-        profileDao.persist(p1);
-        profileDao.persist(p2);
+        for (int i = 0; i < followerCount; i++) {
+            Account a = generateAccount("a" + i);
+            accountDao.persist(a);
+            Profile p = generateProfile(a);
+            profileDao.persist(p);
+            
+            followers.add(p);
+        }
         
-        p3.setFollowers(new HashSet<>(Arrays.asList(p1, p2)));
-        profileDao.persist(p3);
+        mainProfile.setFollowers(followers);
+        profileDao.persist(mainProfile);
         
-        Set<Profile> beforeDelete = profileDao.findFollowing(p2);
+        Set<Profile> beforeDelete = profileDao.findFollowers(mainProfile);
         
         assertNotNull(beforeDelete);
-        assertTrue(beforeDelete.contains(p3));
+        assertTrue(beforeDelete.size() == followers.size());
+        assertTrue(beforeDelete.containsAll(followers));
         
+        profileDao.remove(mainProfile);
         
-        profileDao.remove(p3);
-        Profile profileAfterDelete = profileDao.find(p2.getId());
-        Set<Profile> afterDelete = profileDao.findFollowing(p2);
+        Profile actual = profileDao.find(mainProfile.getId());
+        assertNull(actual);
+    
+        for (Profile follower : followers) {
+            Set<Profile> following = profileDao.findFollowing(follower);
+            assertNull(following);
+        }
         
-        assertNotNull(profileAfterDelete);
-        assertEquals(p2, profileAfterDelete);
-        assertNull(afterDelete);
+        profileDao.findFollowers(mainProfile);
+    }
+    
+    @Test(expected = NoResultException.class)
+    public void removeIfIsFollower() {
+        int followingCount = 3;
+    
+        Account mainAccount = generateAccount("main");
+        accountDao.persist(mainAccount);
+        Profile mainProfile = generateProfile(mainAccount);
+        profileDao.persist(mainProfile);
+        
+        Set<Profile> following = new HashSet<>();
+        Set<Profile> followers = new HashSet<>();
+        followers.add(mainProfile);
+    
+        for (int i = 0; i < followingCount; i++) {
+            Account a = generateAccount("a" + i);
+            accountDao.persist(a);
+            
+            Profile p = generateProfile(a);
+            p.setFollowers(followers);
+            profileDao.persist(p);
+            
+            following.add(p);
+        }
+        
+        Set<Profile> beforeDelete = profileDao.findFollowing(mainProfile);
+        
+        assertNotNull(beforeDelete);
+        assertTrue(beforeDelete.size() == following.size());
+        assertTrue(beforeDelete.containsAll(following));
+        
+        profileDao.remove(mainProfile);
+        
+        Profile actual = profileDao.find(mainProfile.getId());
+        assertNull(actual);
+        
+        for (Profile profile : following) {
+            Set<Profile> profileFollowers = profileDao.findFollowers(profile);
+            assertNull(profileFollowers);
+        }
+        
+        profileDao.findFollowing(mainProfile);
+    }
+    
+    @Test(expected = NoResultException.class)
+    public void removeIfHasFollowerAndIsFollower() {
+        int iterations = 3;
+    
+        Account mainAccount = generateAccount("main");
+        accountDao.persist(mainAccount);
+        Profile mainProfile = generateProfile(mainAccount);
+        profileDao.persist(mainProfile);
+        
+        Set<Profile> otherProfiles = new HashSet<>();
+        Set<Profile> otherFollowers = new HashSet<>();
+        otherFollowers.add(mainProfile);
+    
+        for (int i = 0; i < iterations; i++) {
+            Account a = generateAccount("a" + i);
+            accountDao.persist(a);
+        
+            Profile p = generateProfile(a);
+            p.setFollowers(otherFollowers);
+            profileDao.persist(p);
+            
+            otherProfiles.add(p);
+        }
+        
+        mainProfile.setFollowers(otherProfiles);
+        profileDao.updateFollowers(mainProfile);
+        
+        profileDao.remove(mainProfile);
+        
+        Profile actual = profileDao.find(mainProfile.getId());
+        assertNull(actual);
+        
+        profileDao.findFollowers(mainProfile);
+        profileDao.findFollowing(mainProfile);
     }
 }

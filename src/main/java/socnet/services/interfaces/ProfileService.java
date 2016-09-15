@@ -119,11 +119,22 @@ public interface ProfileService {
 
     /**
      * Removes a profile with a given id.
+     *
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     void remove(Integer id);
+    
+    /**
+     * Removes a profile with a given login.
+     *
+     * @throws javax.persistence.NoResultException if profile not found
+     * */
+    void remove(String login);
 
     /**
      * Removes a given profile.
+     *
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     void remove(Profile profile);
 }

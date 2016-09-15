@@ -200,7 +200,7 @@ app.service('ProfileService', function ($http, $window) {
     };
 });
 
-app.service('AccountService', function ($http) {
+app.service('AccountService', function ($http, $window) {
     this.get = function(login) {
         var account = null;
 
@@ -252,5 +252,19 @@ app.service('AccountService', function ($http) {
         };
 
         return $http.delete(restUrl.account + '/' + login, config);
+    };
+
+    this.logout = function (csrfToken) {
+        var config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        };
+
+        $http.post(url.logout, '', config).then(
+            function () {
+                $window.location.href = url.login + '?delete';
+            });
     }
 });

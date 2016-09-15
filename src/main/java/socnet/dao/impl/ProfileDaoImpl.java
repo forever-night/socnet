@@ -230,26 +230,26 @@ public class ProfileDaoImpl implements ProfileDao{
     @Override
     @Transactional
     public void remove(Profile profile) {
-//        TODO fix removal of followers and following
-//        Profile old = em.find(Profile.class, profile.getId());
-//        Set<Profile> oldFollowerSet = findFollowersWithLogin(old);
-//        Set<Profile> oldFollowingSet = findFollowingWithLogin(old);
-//
-//
-//        if (oldFollowerSet != null && !oldFollowerSet.isEmpty()) {
-//            oldFollowerSet.removeAll(oldFollowerSet);
-//
-//            updateFollowers(old);
-//        }
-//
-//        if (oldFollowingSet != null && !oldFollowingSet.isEmpty())
-//            for (Profile following : oldFollowingSet) {
-//                following.getFollowers().remove(old);
-//                em.merge(following);
-//                em.flush();
-//            }
+        Profile old = em.find(Profile.class, profile.getId());
         
-//        em.remove(old);
+        if (old == null)
+            throw new NoResultException();
+        
+        Set<Profile> oldFollowerSet = findFollowers(old);
+        Set<Profile> oldFollowingSet = findFollowing(old);
+
+        if (oldFollowerSet != null && !oldFollowerSet.isEmpty()) {
+            oldFollowerSet.clear();
+            updateFollowers(old);
+        }
+
+        if (oldFollowingSet != null && !oldFollowingSet.isEmpty())
+            for (Profile following : oldFollowingSet) {
+                following.getFollowers().remove(old);
+                em.merge(following);
+            }
+            
+        em.remove(old);
     }
     
     private Map<String, Profile> mapResultListAsLoginProfileMap(List<Map<String, Object>> queryResultList) {

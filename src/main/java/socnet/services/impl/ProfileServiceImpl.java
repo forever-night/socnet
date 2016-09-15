@@ -218,15 +218,23 @@ public class ProfileServiceImpl implements ProfileService {
     public void remove(Integer id) {
         Profile profile = new Profile();
         profile.setId(id);
-        
         profileDao.remove(profile);
     }
-
+    
+    @Override
+    public void remove(String login) {
+        Profile profile = profileDao.findByLogin(login);
+        profileDao.remove(profile);
+    }
+    
     @Override
     public void remove(Profile profile) {
         profileDao.remove(profile);
     }
     
+    /**
+     * Retrieves profile ids from map of login - profile pairs.
+     * */
     private List<Integer> getIdListFromLoginProfileMap(Map<String, Profile> loginProfileMap) {
         List<Integer> idList = new ArrayList<>();
     
@@ -238,6 +246,9 @@ public class ProfileServiceImpl implements ProfileService {
         return idList;
     }
     
+    /**
+     * Converts login - profile pairs into ProfileDto objects.
+     * */
     private List<ProfileDto> stringProfileMapToDtoList(Map<String, Profile> map) {
         List<ProfileDto> dtoList = new ArrayList<>();
         
@@ -250,6 +261,13 @@ public class ProfileServiceImpl implements ProfileService {
         return dtoList;
     }
     
+    /**
+     * Converts login - profile pairs into ProfileDto objects. Sets isFollowing for profileDtos that are followed by
+     * current user.
+     *
+     * @param map login - profile map
+     * @param followedIds list of profile ids that are followed by current user
+     * */
     private List<ProfileDto> stringProfileMapToDtoList(Map<String, Profile> map, List<Integer> followedIds) {
         List<ProfileDto> dtoList = new ArrayList<>();
     

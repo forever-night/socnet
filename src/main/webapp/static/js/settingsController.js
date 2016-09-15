@@ -1,4 +1,5 @@
-app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService, ValidateService, StatusService, AccountService) {
+app.controller('SettingsCtrl', function ($scope, $http, $window,
+                                         ProfileService, ValidateService, StatusService, AccountService) {
     $scope.profileSelected = true;
     $scope.accountSelected = false;
     $scope.profile = null;
@@ -212,20 +213,8 @@ app.controller('SettingsCtrl', function ($scope, $http, $window, ProfileService,
                 function success(response) {
                     if (response.status == 204)
                         StatusService.setStatus(statusElement.delete, false, message.error.accountNotFound);
-                    else {
-                        var config = {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken
-                            }
-                        };
-
-                        // TODO replace with service
-                        $http.post(url.logout, '', config).then(
-                            function () {
-                                $window.location.href = url.login + '?delete';
-                            });
-                    }
+                    else
+                        AccountService.logout(csrfToken);
                 },
                 function error(response) {
                     StatusService.setStatus(statusElement.delete, false,

@@ -56,6 +56,7 @@ public interface ProfileDao {
      * Find profiles of followers of a given profile.
      *
      * @return set of profiles or null if not found
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     Set<Profile> findFollowers(Profile profile);
     
@@ -63,6 +64,7 @@ public interface ProfileDao {
      * Find login - profile pairs of followers of a given profile.
      *
      * @return map of login - profile pairs or null if no result found
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     Map<String, Profile> findFollowersWithLogin(Profile profile);
     
@@ -70,6 +72,7 @@ public interface ProfileDao {
      * Find profiles followed by a given profile.
      *
      * @return set of profiles or null if not found
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     Set<Profile> findFollowing(Profile profile);
     
@@ -77,6 +80,7 @@ public interface ProfileDao {
      * Find login - profile pairs that are followed by a given profile.
      *
      * @return map of login - profile pairs or null if not found
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     Map<String, Profile> findFollowingWithLogin(Profile profile);
 
@@ -107,6 +111,8 @@ public interface ProfileDao {
 
     /**
      * Removes a profile.
+     *
+     * @throws javax.persistence.NoResultException if profile not found
      * */
     void remove(Profile profile);
 }
