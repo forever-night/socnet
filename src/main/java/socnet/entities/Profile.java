@@ -1,11 +1,6 @@
 package socnet.entities;
 
-import org.hibernate.annotations.*;
-
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -43,11 +38,8 @@ public class Profile implements Serializable {
     @OneToMany(mappedBy = "receiver")
     private List<PrivateMessage> receivedPrivate;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = {CascadeType.ALL})
     private List<PublicMessage> sentPublic;
-
-    @OneToMany(mappedBy = "receiver")
-    private List<PublicMessage> receivedPublic;
 
     @Version
     private Integer version;
@@ -138,14 +130,6 @@ public class Profile implements Serializable {
 
     public void setSentPublic(List<PublicMessage> sentPublic) {
         this.sentPublic = sentPublic;
-    }
-
-    public List<PublicMessage> getReceivedPublic() {
-        return receivedPublic;
-    }
-
-    public void setReceivedPublic(List<PublicMessage> receivedPublic) {
-        this.receivedPublic = receivedPublic;
     }
 
     public Integer getVersion() {

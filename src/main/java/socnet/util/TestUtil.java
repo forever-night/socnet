@@ -6,8 +6,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import socnet.dto.AccountDto;
 import socnet.dto.ProfileDto;
+import socnet.dto.PublicMessageDto;
 import socnet.entities.Account;
 import socnet.entities.Profile;
+import socnet.entities.PublicMessage;
 
 
 public class TestUtil {
@@ -30,6 +32,11 @@ public class TestUtil {
     
     public static StringHttpMessageConverter stringHttpMessageConverter() {
         return new StringHttpMessageConverter();
+    }
+    
+    public static String toJson(Object object, MappingJackson2HttpMessageConverter jackson2HttpMessageConverter)
+            throws JsonProcessingException {
+        return jackson2HttpMessageConverter.getObjectMapper().writeValueAsString(object);
     }
     
     public static Account generateAccount() {
@@ -103,8 +110,24 @@ public class TestUtil {
         return profileDto;
     }
     
-    public static String toJson(Object object, MappingJackson2HttpMessageConverter jackson2HttpMessageConverter)
-            throws JsonProcessingException {
-        return jackson2HttpMessageConverter.getObjectMapper().writeValueAsString(object);
+    public static PublicMessage generatePublicMessage(Profile sender) {
+        PublicMessage msg = new PublicMessage();
+        msg.setTextContent("test message");
+        msg.setSender(sender);
+        return msg;
+    }
+    
+    public static PublicMessage generatePublicMessage(String text, Profile sender) {
+        PublicMessage msg = new PublicMessage();
+        msg.setTextContent(text);
+        msg.setSender(sender);
+        return msg;
+    }
+    
+    public static PublicMessageDto generatePublicMessageDto(PublicMessage message) {
+        PublicMessageDto messageDto = new PublicMessageDto();
+        messageDto.setTextContent(message.getTextContent());
+        messageDto.setCreatedAt(message.getCreatedAt());
+        return messageDto;
     }
 }

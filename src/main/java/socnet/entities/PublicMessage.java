@@ -8,9 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-/**
- * Created by anna on 14/03/16.
- */
+
 @Entity
 @Table(name = "public_message")
 public class PublicMessage implements Serializable, Message {
@@ -19,12 +17,8 @@ public class PublicMessage implements Serializable, Message {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private Profile sender;
-
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private Profile receiver;
 
     @Column(name = "text_content")
     private String textContent;
@@ -58,14 +52,6 @@ public class PublicMessage implements Serializable, Message {
         this.sender = sender;
     }
 
-    public Profile getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(Profile location) {
-        this.receiver = location;
-    }
-
     public String getTextContent() {
         return textContent;
     }
@@ -95,7 +81,6 @@ public class PublicMessage implements Serializable, Message {
         return "PublicMessage{" +
                 "id=" + id +
                 ", sender=" + sender +
-                ", location=" + receiver +
                 '}';
     }
 
@@ -105,13 +90,12 @@ public class PublicMessage implements Serializable, Message {
         if (o == null || getClass() != o.getClass()) return false;
         PublicMessage that = (PublicMessage) o;
         return Objects.equals(sender, that.sender) &&
-                Objects.equals(receiver, that.receiver) &&
                 Objects.equals(textContent, that.textContent) &&
                 Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sender, receiver, textContent, createdAt);
+        return Objects.hash(sender, textContent, createdAt);
     }
 }
