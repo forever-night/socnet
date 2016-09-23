@@ -114,3 +114,40 @@ app.service('SearchService', function ($http) {
        );
    }
 });
+
+app.service('PageService', function() {
+    this.prevPage = function(currentPage, resultsPerPage, resultArray) {
+        var prevPage = currentPage - 1;
+
+        if (prevPage >= 0) {
+            var from = resultsPerPage * prevPage;
+            var to = resultsPerPage * currentPage;
+
+            var resultArrayToLoad = [];
+
+            for (var i = from; i < to; i++)
+                resultArrayToLoad.push(resultArray[i]);
+        }
+
+        return resultArrayToLoad;
+    };
+
+    this.nextPage = function(currentPage, resultsPerPage, resultArray) {
+        var nextPage = currentPage + 1;
+
+        if (resultArray.length > resultsPerPage * nextPage) {
+            var from = resultsPerPage * nextPage;
+            var to = resultsPerPage * (nextPage + 1);
+
+            // if actual array is smaller than calculated 'to' variable
+            to = resultArray.length >= to ? to : resultArray.length;
+
+            var resultArrayToLoad = [];
+
+            for (var i = from; i < to; i++)
+                resultArrayToLoad.push(resultArray[i]);
+        }
+
+        return resultArrayToLoad;
+    };
+});

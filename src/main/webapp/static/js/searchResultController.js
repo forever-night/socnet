@@ -1,13 +1,17 @@
 var paramSearchQuery;
 
-app.controller('SearchResultCtrl', function($scope, SearchService, StatusService, ProfileService){
+app.controller('SearchResultCtrl', function($scope, SearchService, StatusService, ProfileService, PageService){
     $scope.searchQuery = paramSearchQuery != null ? paramSearchQuery : '';
     $scope.searchResult = [];
     $scope.currentLogin = currentLogin;
+    $scope.currentPage = 0;
+    $scope.pageCount = 0;
 
     var searchResult = [];
     var status = document.getElementById('status');
     var csrfToken = document.getElementsByName('_csrf')[0].content;
+
+    var resultsPerPage = 20;
 
 
     $scope.search = function (query) {
@@ -20,13 +24,13 @@ app.controller('SearchResultCtrl', function($scope, SearchService, StatusService
         SearchService.search(query).then(
             function success(response) {
                 searchResult = response;
+                $scope.pageCount = Math.ceil(searchResult.length / resultsPerPage);
 
                 if (searchResult.length == 0)
                     StatusService.setStatus(status, true, message.error.profileNotFound);
 
-                // TODO make multiple pages for big results
                 searchResult.forEach(function(item, i, searchResult) {
-                    if (i >= 10)
+                    if (i >= resultsPerPage)
                         return;
 
                     $scope.searchResult.push(searchResult[i]);
@@ -55,6 +59,20 @@ app.controller('SearchResultCtrl', function($scope, SearchService, StatusService
                     profileToUnfollow.profile.isFollowing = false;
             }
         );
+    };
+
+    $scope.prevPage = function() {
+        $scope.searchResult = PageService.prevPage($scope.currentPage, resultsPerPage, searchResult);
+
+        if ($scope.currentPage > 0)
+            $scope.currentPage--;
+    };
+
+    $scope.nextPage = function() {
+        $scope.searchResult = PageService.nextPage($scope.currentPage, resultsPerPage, searchResult);
+
+        if ($scope.currentPage < $scope.pageCount - 1)
+            $scope.currentPage++;
     };
 
 

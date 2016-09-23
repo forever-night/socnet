@@ -54,6 +54,12 @@
                 </div>
             </div>
         </div>
+        <nav>
+            <ul class="pager">
+                <li ng-if="currentPage > 0"><a href="#" ng-click="prevPage()">Previous</a></li>
+                <li ng-if="currentPage < pageCount - 1"><a href="#" ng-click="nextPage()">Next</a></li>
+            </ul>
+        </nav>
     </div>
     </div>
 </jsp:body>

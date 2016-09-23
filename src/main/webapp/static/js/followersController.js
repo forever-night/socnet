@@ -1,10 +1,12 @@
-app.controller('FollowersCtrl', function($scope, $window, ProfileService, StatusService) {
+app.controller('FollowersCtrl', function($scope, $window, ProfileService, StatusService, PageService) {
     $scope.followersSelected = true;
     $scope.followingSelected = false;
     $scope.followers = [];
     $scope.following = [];
     $scope.currentLogin = currentLogin;
     $scope.profileLogin = $scope.currentLogin;
+    $scope.currentPage = 0;
+    $scope.pageCount = 0;
 
     var statusElement = document.getElementById('status');
     var csrfToken = document.getElementsByName('_csrf')[0].content;
@@ -17,6 +19,8 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
         following : document.getElementById('tabFollowing')
     };
 
+    var resultsPerPage = 20;
+
 
     $scope.getFollowers = function (login) {
         ProfileService.getFollowers(login).then(
@@ -25,10 +29,11 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
                     StatusService.setStatus(statusElement, true, login + ' has no followers.');
                 else {
                     followers = response;
+                    $scope.pageCount = Math.ceil(followers.length / resultsPerPage);
 
-                    // TODO make multiple pages for big results
+                    // populates the first page with results
                     followers.forEach(function(item, i, followers) {
-                        if (i >= 10)
+                        if (i >= resultsPerPage)
                             return;
 
                         $scope.followers.push(item);
@@ -49,10 +54,11 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
                     StatusService.setStatus(statusElement, true, login + ' follows no one.');
                 else {
                     following = response;
+                    $scope.pageCount = Math.ceil(following.length / resultsPerPage);
 
-                    // TODO make multiple pages for big results
+                    // populates the first page with results
                     following.forEach(function(item, i, following) {
-                        if (i >= 10)
+                        if (i >= resultsPerPage)
                             return;
 
                         $scope.following.push(item);
@@ -124,6 +130,26 @@ app.controller('FollowersCtrl', function($scope, $window, ProfileService, Status
             $scope.followers = [];
             $scope.getFollowing($scope.profileLogin);
         }
+    };
+
+    $scope.prevPage = function () {
+        if ($scope.followersSelected)
+            $scope.followers = PageService.prevPage($scope.currentPage, resultsPerPage, followers);
+        else if ($scope.followingSelected)
+            $scope.following = PageService.prevPage($scope.currentPage, resultsPerPage, following);
+
+        if ($scope.currentPage > 0)
+            $scope.currentPage--;
+    };
+
+    $scope.nextPage = function () {
+        if ($scope.followersSelected)
+            $scope.followers = PageService.nextPage($scope.currentPage, resultsPerPage, followers);
+        else if ($scope.followingSelected)
+            $scope.following = PageService.nextPage($scope.currentPage, resultsPerPage, following);
+
+        if ($scope.currentPage < $scope.pageCount - 1)
+            $scope.currentPage++;
     };
 
 
