@@ -10,7 +10,9 @@
     </c:if>
     <script>var currentLogin = "${currentLogin}";</script>
     <script src="<c:url value='/static/js/classes/profile.js'/>"></script>
+    <script src="<c:url value="/static/js/classes/message.js"/>"></script>
     <script src="<c:url value='/static/js/profileController.js'/>"></script>
+    <script src="<c:url value="/static/js/messageController.js"/>"></script>
     <sec:csrfMetaTags/>
     <title>profile</title>
 </jsp:attribute>
@@ -53,6 +55,24 @@
                     </li>
                     <li><h6><a href="${pageContext.request.contextPath}/communities">Communities</a></h6></li>
                 </ul>
+            </div>
+        </div>
+        <div class="col-sm-12" style="margin-top:3em;">
+            <textarea class="form-control" rows="3" placeholder="send a message..."
+                      ng-model="newMessage.textContent"></textarea>
+            <button class="btn btn-sm btn-primary col-sm-offset-8 col-md-offset-10 col-sm-4 col-md-2"
+                    style="margin-top:1em;" ng-click="sendMessage()">Send</button>
+        </div>
+        <div class="col-sm-12" style="margin-top:2em;">
+            <h5><small>{{messages.length}} messages</small></h5>
+            <div class="panel panel-primary" ng-repeat="message in messages">
+                <div class="panel-body">
+                    <h5><b>@{{message.senderLogin}}</b></h5>
+                    <h5>{{message.textContent}}</h5>
+                    <h5><small>
+                        {{message.createdAt}}
+                    </small></h5>
+                </div>
             </div>
         </div>
         </jsp:attribute>

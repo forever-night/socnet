@@ -13,7 +13,8 @@ url = {
 restUrl = {
     profile: context + '/api/profile',
     search: context + '/api/profile?search=',
-    account: context + '/api/account'
+    account: context + '/api/account',
+    publicMessage: context + '/api/public'
 };
 
 configJson = {

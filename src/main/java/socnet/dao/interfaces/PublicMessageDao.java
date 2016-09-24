@@ -15,7 +15,7 @@ public interface PublicMessageDao {
     PublicMessage find(int id);
     
     /**
-     * Find all public messages sent by given profile.
+     * Find all public messages sent by given profile. Messages are ordered by createdAt desc.
      *
      * @return list of PublicMessage or null if has no messages
      * @throws javax.persistence.NoResultException if profile not found

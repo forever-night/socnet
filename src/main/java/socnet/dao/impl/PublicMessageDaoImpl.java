@@ -1,5 +1,6 @@
 package socnet.dao.impl;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -30,13 +32,18 @@ public class PublicMessageDaoImpl implements PublicMessageDao {
     }
         
     @Override
+    @Transactional
     public List<PublicMessage> findByProfile(Profile profile) {
         if (profile.getId() != null) {
             Profile sender = profileDao.find(profile.getId());
             
             if (sender != null) {
                 List<PublicMessage> result = sender.getSentPublic();
-                return result == null || result.isEmpty() ? null : new ArrayList<>(result);
+                
+                if (result != null)
+                    Collections.reverse(result);
+                
+                return result == null || result.isEmpty() ? null : new ArrayList<>(sender.getSentPublic());
             }
         }
         
@@ -49,8 +56,10 @@ public class PublicMessageDaoImpl implements PublicMessageDao {
         if (publicMessage != null) {
     
             Profile sender = publicMessage.getSender();
+            Hibernate.initialize(sender);
     
             if (sender != null) {
+                Hibernate.initialize(sender.getSentPublic());
                 List<PublicMessage> pmList = sender.getSentPublic();
     
                 if (pmList == null)

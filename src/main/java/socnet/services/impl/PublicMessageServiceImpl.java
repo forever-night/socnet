@@ -2,6 +2,7 @@ package socnet.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import socnet.dao.interfaces.AccountDao;
 import socnet.dao.interfaces.ProfileDao;
 import socnet.dao.interfaces.PublicMessageDao;
@@ -68,6 +69,7 @@ public class PublicMessageServiceImpl implements PublicMessageService{
     }
     
     @Override
+    @Transactional
     public List<PublicMessage> findBySenderLogin(String login) {
         Profile sender = profileDao.findByLogin(login);
         
@@ -96,6 +98,7 @@ public class PublicMessageServiceImpl implements PublicMessageService{
     }
     
     @Override
+    @Transactional
     public Integer create(PublicMessageDto publicMessageDto) {
         String login = publicMessageDto.getSenderLogin();
         

@@ -1,7 +1,9 @@
-app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
+app.controller('ProfileCtrl', function($scope, $window, ProfileService, MessageService) {
     $scope.profile = null;
     $scope.profileLogin = null;
     $scope.isFollowing = null;
+    $scope.messages = [];
+    $scope.newMessage = new Message();
 
     var csrfToken = document.getElementsByName('_csrf')[0].content;
 
@@ -40,6 +42,37 @@ app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
         );
     };
 
+    // TODO pagination
+    $scope.getMessages = function() {
+        MessageService.get($scope.profileLogin).then(
+            function(response){
+                response.forEach(function(item, i, response){
+                    var timestamp = new Date(item.createdAt);
+                    var readableDate = timestamp.toLocaleTimeString() + ' ' + timestamp.toLocaleDateString();
+
+                    item.createdAt = readableDate;
+                });
+
+                $scope.messages = response;
+            }
+        );
+    };
+
+    $scope.sendMessage = function() {
+        $scope.newMessage.senderLogin = currentLogin;
+        $scope.newMessage.createdAt = new Date();
+
+        MessageService.post($scope.newMessage, csrfToken).then(
+            function (response) {
+                if (response.status == 200) {
+                    //    TODO status 'message sent'
+                    $scope.newMessage.textContent = '';
+                    $scope.getMessages();
+                }
+            }
+        );
+    };
+
 
     if (typeof ownerLogin !== 'undefined' && ownerLogin != null) {
         $scope.getProfile(ownerLogin);
@@ -48,6 +81,8 @@ app.controller('ProfileCtrl', function($scope, $window, ProfileService) {
         $scope.getProfile(currentLogin);
         $scope.profileLogin = currentLogin;
     }
+
+    $scope.getMessages();
 });
 
 
